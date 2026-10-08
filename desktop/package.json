@@ -28,7 +28,7 @@
     "copyright": "Global Link",
     "directories": { "output": "release", "buildResources": "build" },
     "files": ["main.cjs", "preload.cjs", "offline.html", "build/icon.png", "build/tray.png", "build/tray@2x.png", "package.json"],
-    "publish": [{ "provider": "github", "owner": "ztg981", "repo": "global-link-portal", "releaseType": "release" }],
+    "publish": [{ "provider": "github", "owner": "ztg981", "repo": "global-link-portal", "releaseType": "draft" }],
     "win": {
       "target": [{ "target": "nsis", "arch": ["x64"] }],
       "icon": "build/icon.png",
