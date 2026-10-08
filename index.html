@@ -92,7 +92,7 @@ input,textarea{font-family:inherit}
         <sc-if value="{{ hasUnreadNotif }}"><span style="position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--gl-danger);border:2px solid var(--gl-hero)"></span></sc-if>
       </button>
       <button data-tour="tb-avatar" sc-camel-on-click="{{ toggleMeTop }}" title="Your profile" style="display:flex;align-items:center;gap:5px;height:36px;padding:2px 8px 2px 2px;border-radius:999px;border:1px solid var(--gl-line);background:var(--gl-card);cursor:pointer;color:var(--gl-muted);transition:box-shadow .2s,border-color .2s" style-hover="border-color:var(--gl-blue-soft);box-shadow:0 0 0 3px rgba(47,140,243,.12)">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" src="{{ me.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" sc-camel-src="{{ me.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>
         <x-import component-from-global-scope="GLIcon" n="chevron-down" s="13" hint-size="13px,13px"></x-import>
       </button>
     </sc-if>
@@ -213,7 +213,7 @@ input,textarea{font-family:inherit}
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px">
               <div sc-camel-on-click="{{ noteGoal }}" style="cursor:pointer;padding:6px;transition:transform .3s var(--gl-ease-spring)" style-hover="transform:translateY(-3px) rotate(-1deg)"><x-import component-from-global-scope="GlobalLinkUI.StickyNote" title="{{ wGoalTitle }}" tape="{{ true }}" tilt="{{ -1.5 }}" hint-size="100%,120px">{{ wGoal }}</x-import></div>
               <div style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:10px;align-content:start"><div style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.08em;color:var(--gl-faint);white-space:nowrap"><x-import component-from-global-scope="GLIcon" n="heart" s="14" hint-size="14px,14px"></x-import>{{ wInterestsLabel }}</div><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ wInterests }}" as="wi" hint-placeholder-count="4"><span style="padding:4px 10px;border-radius:999px;background:var(--gl-tint);color:var(--gl-link);font-weight:700;font-size:12.5px;white-space:nowrap">{{ wi.t }}</span></sc-for></div></div>
-              <div style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:10px;align-content:start"><div style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.08em;color:var(--gl-faint);white-space:nowrap"><x-import component-from-global-scope="GLIcon" n="users" s="14" hint-size="14px,14px"></x-import>{{ wReqLabel }}</div><div style="display:flex"><sc-for list="{{ reqView }}" as="ra" hint-placeholder-count="4"><span style="margin-right:-10px;border-radius:50%;box-shadow:0 0 0 2px var(--gl-card)"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ ra.name }}" src="{{ ra.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import></span></sc-for></div><b style="font-size:13.5px">{{ wReqSummary }}</b></div>
+              <div style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:10px;align-content:start"><div style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.08em;color:var(--gl-faint);white-space:nowrap"><x-import component-from-global-scope="GLIcon" n="users" s="14" hint-size="14px,14px"></x-import>{{ wReqLabel }}</div><div style="display:flex"><sc-for list="{{ reqView }}" as="ra" hint-placeholder-count="4"><span style="margin-right:-10px;border-radius:50%;box-shadow:0 0 0 2px var(--gl-card)"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ ra.name }}" sc-camel-src="{{ ra.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import></span></sc-for></div><b style="font-size:13.5px">{{ wReqSummary }}</b></div>
             </div>
             <div style="display:flex;gap:8px;align-items:center;font-size:12.5px;color:var(--gl-faint)"><x-import component-from-global-scope="GLIcon" n="refresh-cw" s="13" hint-size="13px,13px"></x-import>Synced with globallink.com just now</div>
           </div>
@@ -267,7 +267,7 @@ input,textarea{font-family:inherit}
             <div style="display:grid;gap:10px">
               <sc-for list="{{ reqView }}" as="r" hint-placeholder-count="4">
                 <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:14px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);animation:gl-rise .5s var(--gl-ease-out) both;animation-delay:{{ r.delay }}">
-                  <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ r.name }}" src="{{ r.photo }}" size="{{ 46 }}" hint-size="46px,46px"></x-import>
+                  <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ r.name }}" sc-camel-src="{{ r.photo }}" size="{{ 46 }}" hint-size="46px,46px"></x-import>
                   <div style="flex:1;min-width:170px;line-height:1.35"><b style="font-size:14.5px">{{ r.name }}</b><div style="font-size:12.5px;color:var(--gl-muted)">{{ r.subj }}</div><div style="font-size:11.5px;color:var(--gl-faint)">Requested {{ r.date }} {{ r.via }}</div></div>
                   <div style="position:relative;width:220px;flex:none">
                     <div style="position:absolute;left:35px;right:35px;top:7px;height:3px;border-radius:3px;background:var(--gl-line)"><div style="height:100%;width:{{ r.pct }}%;background:var(--gl-grad-primary);border-radius:3px;transition:width .8s var(--gl-ease-out)"></div></div>
@@ -389,7 +389,7 @@ input,textarea{font-family:inherit}
       <div style="margin:10px 12px;padding:12px;border-radius:14px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;grid-template-columns:minmax(0,1fr);gap:8px;overflow:hidden">
         <div style="display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--gl-faint);white-space:nowrap"><span style="width:8px;height:8px;border-radius:50%;background:var(--gl-success-bright);animation:glPulse 2s infinite"></span>{{ L.nextUp }}</div>
         <div style="display:flex;align-items:center;gap:10px">
-          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ next.person }}" src="{{ next.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>
+          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ next.person }}" sc-camel-src="{{ next.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>
           <div style="min-width:0;line-height:1.3"><div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ next.personFirst }} · {{ next.cls }}</div><div style="font-family:var(--gl-font-mono);font-size:12px;color:var(--gl-blue);font-weight:700">{{ countdown }}</div></div>
         </div>
         <button sc-camel-on-click="{{ openPrejoin }}" style="height:32px;border:0;border-radius:10px;background:var(--gl-grad-cta);color:#fff;font-weight:700;font-size:12.5px;cursor:pointer;transition:transform .15s" style-hover="transform:translateY(-1px)" style-active="transform:scale(.97)">{{ L.join }}</button>
@@ -410,7 +410,7 @@ input,textarea{font-family:inherit}
     <div style="position:relative;border-top:1px solid var(--gl-line);padding:10px">
       <div style="display:flex;align-items:center;gap:4px">
       <button sc-camel-on-click="{{ toggleMe }}" style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:6px;border:0;border-radius:12px;background:transparent;color:var(--gl-ink);cursor:pointer;text-align:left" style-hover="background:var(--gl-tint)">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" src="{{ me.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" sc-camel-src="{{ me.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import>
         <span style="flex:1;min-width:0;display:grid;line-height:1.25;opacity:{{ labelOp }}"><b style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ me.name }}</b><span style="font-size:11.5px;color:var(--gl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ me.sub }}</span></span>
       </button>
       <sc-if value="{{ expanded }}"><button data-tour="side-settings" sc-camel-on-click="{{ goSettings }}" title="Settings" aria-label="Settings" style="width:34px;height:34px;flex:none;border-radius:11px;border:1px solid {{ setBd }};background:{{ setBg }};color:{{ setFg }};cursor:pointer;display:grid;place-items:center;transition:transform .55s var(--gl-ease-spring),background .2s,color .2s,border-color .2s,box-shadow .2s;animation:gl-pop .45s var(--gl-ease-spring)" style-hover="transform:rotate(90deg);color:var(--gl-blue);border-color:var(--gl-blue-soft);box-shadow:0 0 0 4px rgba(47,140,243,.12)" style-active="transform:rotate(90deg) scale(.9)"><x-import component-from-global-scope="GLIcon" n="settings" s="17" hint-size="17px,17px"></x-import></button></sc-if>
@@ -531,7 +531,7 @@ input,textarea{font-family:inherit}
       <div style="display:grid;gap:8px">
         <sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="0">
           <button sc-camel-on-click="{{ u.open }}" style="display:flex;gap:12px;align-items:center;padding:8px;border:0;border-radius:12px;background:transparent;color:var(--gl-ink);cursor:pointer;text-align:left;transition:background .2s" style-hover="background:var(--gl-soft)">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.person }}" src="{{ u.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.person }}" sc-camel-src="{{ u.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
             <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:13.5px">{{ u.person }} · {{ u.cls }}</div><div style="font-size:12px;color:var(--gl-muted)">{{ u.rel }} · <span style="font-family:var(--gl-font-mono)">{{ u.time }}</span></div><div style="font-size:11.5px;color:var(--gl-faint)">{{ u.other }}</div></div>
           </button>
         </sc-for>
@@ -617,7 +617,7 @@ input,textarea{font-family:inherit}
       <div style="display:grid;gap:8px">
         <sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="4">
           <button sc-camel-on-click="{{ u.open }}" style="display:flex;gap:12px;align-items:center;padding:8px;border:0;border-radius:12px;background:transparent;color:var(--gl-ink);cursor:pointer;text-align:left;transition:background .2s" style-hover="background:var(--gl-soft)">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.person }}" src="{{ u.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.person }}" sc-camel-src="{{ u.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
             <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:13.5px">{{ u.cls }}</div><div style="font-size:12px;color:var(--gl-muted)">{{ u.rel }} · <span style="font-family:var(--gl-font-mono)">{{ u.time }}</span></div><div style="font-size:11.5px;color:var(--gl-faint)">{{ u.other }}</div></div>
           </button>
         </sc-for>
@@ -691,7 +691,7 @@ input,textarea{font-family:inherit}
         <sc-if value="{{ hasTReqs }}"><button sc-camel-on-click="{{ goStudents }}" style="width:100%;display:flex;gap:12px;align-items:center;padding:10px;border-radius:14px;border:1px solid var(--gl-blue-soft);background:var(--gl-tint);color:var(--gl-ink);cursor:pointer;text-align:left;margin-bottom:10px"><x-import component-from-global-scope="GLIcon" n="user-plus" s="18" c="var(--gl-blue)" hint-size="18px,18px"></x-import><span style="flex:1;font-size:13px"><b>{{ lv.reqsWaiting }} new student request(s)</b><span style="display:block;font-size:12px;color:var(--gl-muted)">Accept or decline in Students</span></span></button></sc-if>
         <sc-for list="{{ tqTop }}" as="q" hint-placeholder-count="0">
           <button sc-camel-on-click="{{ goQuestions }}" style="width:100%;display:flex;gap:12px;align-items:center;padding:8px;border:0;border-radius:12px;background:transparent;color:var(--gl-ink);cursor:pointer;text-align:left" style-hover="background:var(--gl-soft)">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.name }}" src="{{ q.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.name }}" sc-camel-src="{{ q.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import>
             <span style="min-width:0;flex:1"><span style="display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.q }}</span><span style="font-size:11.5px;color:var(--gl-muted)">{{ q.first }} · {{ q.type }} · {{ q.left }}</span></span>
           </button>
         </sc-for>
@@ -704,7 +704,7 @@ input,textarea{font-family:inherit}
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b style="font-size:16px">Coming up</b><button sc-camel-on-click="{{ goSchedule }}" style="border:0;background:none;color:var(--gl-link);font-weight:700;font-size:13px;cursor:pointer">Schedule</button></div>
       <div style="display:grid;gap:6px"><sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="0">
           <button sc-camel-on-click="{{ u.open }}" style="display:flex;gap:12px;align-items:center;padding:8px;border:0;border-radius:12px;background:transparent;color:var(--gl-ink);cursor:pointer;text-align:left;transition:background .2s" style-hover="background:var(--gl-soft)">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.person }}" src="{{ u.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.person }}" sc-camel-src="{{ u.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
             <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:13.5px">{{ u.person }} · {{ u.cls }}</div><div style="font-size:12px;color:var(--gl-muted)">{{ u.rel }} · <span style="font-family:var(--gl-font-mono)">{{ u.time }}</span></div><div style="font-size:11.5px;color:var(--gl-faint)">{{ u.other }}</div></div>
           </button>
         </sc-for><sc-if value="{{ lv.upEmpty }}"><div style="display:grid;justify-items:center;gap:8px;padding:22px 10px;text-align:center;color:var(--gl-muted);font-size:13px"><span style="width:40px;height:40px;border-radius:12px;background:var(--gl-soft);color:var(--gl-faint);display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="calendar" s="18" hint-size="18px,18px"></x-import></span>No lessons booked yet.</div></sc-if></div>
@@ -714,7 +714,7 @@ input,textarea{font-family:inherit}
       <div style="display:grid;gap:6px">
         <sc-for list="{{ studs }}" as="st" hint-placeholder-count="0">
           <button sc-camel-on-click="{{ st.pick }}" style="display:flex;gap:12px;align-items:center;padding:8px;border:0;border-radius:12px;background:transparent;color:var(--gl-ink);cursor:pointer;text-align:left" style-hover="background:var(--gl-soft)">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ st.name }}" src="{{ st.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ st.name }}" sc-camel-src="{{ st.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
             <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:13.5px">{{ st.name }}</div><div style="font-size:12px;color:var(--gl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ st.goal }}</div></div>
             <span style="font-size:11.5px;color:var(--gl-faint);white-space:nowrap">{{ st.next }}</span>
           </button>
@@ -768,7 +768,7 @@ input,textarea{font-family:inherit}
           <button sc-camel-on-click="{{ goQuestions }}" style="width:100%;display:flex;gap:12px;align-items:center;padding:8px;border:0;border-radius:12px;background:transparent;color:var(--gl-ink);cursor:pointer;text-align:left" style-hover="background:var(--gl-soft)">
             <span style="position:relative;width:40px;height:40px;flex:none">
               <svg width="40" height="40" sc-camel-view-box="0 0 40 40" style="transform:rotate(-90deg);position:absolute;inset:0"><circle cx="20" cy="20" r="16" fill="none" style="stroke:var(--gl-line);stroke-width:3.5"></circle><circle cx="20" cy="20" r="16" fill="none" style="stroke:{{ q.ring }};stroke-width:3.5;stroke-linecap:round;stroke-dasharray:{{ q.dash }}"></circle></svg>
-              <span style="position:absolute;inset:6px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.name }}" src="{{ q.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import></span>
+              <span style="position:absolute;inset:6px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.name }}" sc-camel-src="{{ q.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import></span>
             </span>
             <span style="min-width:0;flex:1"><span style="display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.q }}</span><span style="font-size:11.5px;color:var(--gl-muted)">{{ q.first }} · {{ q.type }} · {{ q.left }}</span></span>
           </button>
@@ -782,7 +782,7 @@ input,textarea{font-family:inherit}
       <div style="display:grid;gap:6px">
         <sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="4">
           <button sc-camel-on-click="{{ u.open }}" style="display:flex;gap:12px;align-items:center;padding:8px;border:0;border-radius:12px;background:transparent;color:var(--gl-ink);cursor:pointer;text-align:left" style-hover="background:var(--gl-soft)">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.person }}" src="{{ u.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.person }}" sc-camel-src="{{ u.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
             <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:13.5px">{{ u.person }} · {{ u.cls }}</div><div style="font-size:12px;color:var(--gl-muted)">{{ u.rel }} · <span style="font-family:var(--gl-font-mono)">{{ u.time }}</span> <span style="color:var(--gl-faint)">· {{ u.other }}</span></div></div>
           </button>
         </sc-for>
@@ -793,7 +793,7 @@ input,textarea{font-family:inherit}
       <div style="display:grid;gap:6px">
         <sc-for list="{{ studs }}" as="st" hint-placeholder-count="4">
           <button sc-camel-on-click="{{ st.pick }}" style="display:flex;gap:12px;align-items:center;padding:8px;border:0;border-radius:12px;background:transparent;color:var(--gl-ink);cursor:pointer;text-align:left" style-hover="background:var(--gl-soft)">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ st.name }}" src="{{ st.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ st.name }}" sc-camel-src="{{ st.photo }}" size="{{ 36 }}" hint-size="36px,36px"></x-import>
             <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:13.5px">{{ st.name }} <span style="font-family:var(--gl-font-zh);font-weight:500;color:var(--gl-faint)">{{ st.zh }}</span></div><div style="font-size:12px;color:var(--gl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ st.goal }}</div></div>
             <span style="font-size:11.5px;color:var(--gl-faint);white-space:nowrap">{{ st.next }}</span>
           </button>
@@ -872,7 +872,7 @@ input,textarea{font-family:inherit}
         <div style="display:flex;gap:12px;align-items:center">
           <span style="width:42px;height:42px;border-radius:12px;background:var(--gl-tint);color:var(--gl-blue);display:grid;place-items:center;flex:none"><x-import component-from-global-scope="GLIcon" n="{{ c.icon }}" s="20" hint-size="20px,20px"></x-import></span>
           <span style="min-width:0;flex:1;line-height:1.3"><b style="display:block">{{ c.name }}</b><span style="font-size:12px;color:var(--gl-muted)">with {{ c.mentor }}</span></span>
-          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ c.mentor }}" src="{{ c.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import>
+          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ c.mentor }}" sc-camel-src="{{ c.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import>
         </div>
         <div style="font-size:12px;color:var(--gl-muted)">{{ c.done }} lesson(s) · next: {{ c.when }}</div>
       </button>
@@ -881,7 +881,7 @@ input,textarea{font-family:inherit}
   <div style="grid-column:span 2;min-width:0;display:grid;gap:16px">
     <x-import component-from-global-scope="GlobalLinkUI.Card" padding="md" hint-size="100%,400px">
       <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ cls.mentor }}" src="{{ cls.photo }}" size="{{ 48 }}" hint-size="48px,48px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ cls.mentor }}" sc-camel-src="{{ cls.photo }}" size="{{ 48 }}" hint-size="48px,48px"></x-import>
         <div style="flex:1;min-width:0"><b style="font-size:20px;letter-spacing:-.02em">{{ cls.name }}</b><div style="font-size:13px;color:var(--gl-muted)">with {{ cls.mentor }} · {{ cls.when }}</div></div>
         <x-import component-from-global-scope="GlobalLinkUI.Button" variant="soft" size="sm" sc-camel-on-click="{{ bookHome }}" hint-size="130px,38px">Book a lesson</x-import>
       </div>
@@ -909,7 +909,7 @@ input,textarea{font-family:inherit}
         <div style="display:flex;gap:12px;align-items:center">
           <span style="width:42px;height:42px;border-radius:12px;background:var(--gl-tint);color:var(--gl-blue);display:grid;place-items:center;flex:none"><x-import component-from-global-scope="GLIcon" n="{{ c.icon }}" s="20" hint-size="20px,20px"></x-import></span>
           <span style="min-width:0;flex:1;line-height:1.3"><b style="display:block">{{ c.name }}</b><span style="font-family:var(--gl-font-zh);font-size:12px;color:var(--gl-muted)">{{ c.zh }}</span></span>
-          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ c.mentor }}" src="{{ c.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import>
+          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ c.mentor }}" sc-camel-src="{{ c.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import>
         </div>
         <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:var(--gl-muted)"><span style="flex:1;height:6px;border-radius:9px;background:var(--gl-line);overflow:hidden"><span style="display:block;height:100%;width:{{ c.pct }}%;background:var(--gl-grad-primary);border-radius:9px"></span></span>{{ c.done }} of {{ c.of }}</div>
       </button>
@@ -918,7 +918,7 @@ input,textarea{font-family:inherit}
   <div style="grid-column:span 2;min-width:0;display:grid;gap:16px">
     <x-import component-from-global-scope="GlobalLinkUI.Card" padding="md" hint-size="100%,560px">
       <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ cls.mentor }}" src="{{ cls.photo }}" size="{{ 48 }}" hint-size="48px,48px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ cls.mentor }}" sc-camel-src="{{ cls.photo }}" size="{{ 48 }}" hint-size="48px,48px"></x-import>
         <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--gl-blue)">{{ cls.zh }}</div><b style="font-size:20px;letter-spacing:-.02em">{{ cls.name }}</b><div style="font-size:13px;color:var(--gl-muted)">with {{ cls.mentor }} · {{ cls.when }} in Beijing</div></div>
         <x-import component-from-global-scope="GlobalLinkUI.Chip" icon="book" hint-size="140px,32px">{{ cls.lessonsLabel }}</x-import>
       </div>
@@ -1012,7 +1012,7 @@ input,textarea{font-family:inherit}
         <button sc-camel-on-click="{{ closeRecapFull }}" title="Close (Esc)" style="width:32px;height:32px;border-radius:9px;border:0;background:rgba(255,255,255,.08);color:#fff;cursor:pointer;display:grid;place-items:center" style-hover="background:rgba(255,255,255,.18)"><x-import component-from-global-scope="GLIcon" n="minimize-2" s="15" hint-size="15px,15px"></x-import></button>
       </div>
       <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ cls.mentor }}" src="{{ cls.photo }}" size="{{ 64 }}" hint-size="64px,64px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ cls.mentor }}" sc-camel-src="{{ cls.photo }}" size="{{ 64 }}" hint-size="64px,64px"></x-import>
         <div style="flex:1;min-width:240px">
           <div style="font-size:13px;font-weight:700;color:#9cc3f2"><span style="font-family:var(--gl-font-zh)">{{ cls.zh }}</span> · Lesson {{ cls.done }} · {{ recap.date }}</div>
           <h2 style="margin:4px 0 0;font-size:clamp(24px,3vw,32px);line-height:1.15;font-weight:800;letter-spacing:-.025em;text-wrap:balance">{{ recap.title }}</h2>
@@ -1100,7 +1100,7 @@ input,textarea{font-family:inherit}
 
 <sc-if value="{{ P.practice }}">
 <div data-screen-label="Practice" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:16px;align-items:start;animation:gl-rise .5s var(--gl-ease-out)">
-  <div style="grid-column:1/-1;display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:18px 20px;border-radius:var(--gl-r-card);background:var(--gl-sticky);color:var(--gl-sticky-ink)">
+<sc-if value="{{ DEMO }}">  <div style="grid-column:1/-1;display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:18px 20px;border-radius:var(--gl-r-card);background:var(--gl-sticky);color:var(--gl-sticky-ink)">
     <span style="width:44px;height:44px;flex:none;border-radius:14px;background:rgba(61,49,0,.1);display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="hammer" s="22" hint-size="22px,22px"></x-import></span>
     <span style="flex:1;min-width:220px;line-height:1.4"><b style="display:block;font-size:16px">We’re still building Practice</b><span style="font-size:13.5px">Daily lessons built from your classes are on the way. In the meantime, chat with Lumi on the right. She’ll practice anything with you.</span></span>
     <span style="font-family:var(--gl-font-zh);font-size:13px;font-weight:700;opacity:.8">练习功能开发中</span>
@@ -1132,6 +1132,19 @@ input,textarea{font-family:inherit}
       </div>
     </div>
   </x-import>
+</sc-if><sc-if value="{{ LIVE }}"><x-import component-from-global-scope="GlobalLinkUI.Card" padding="md" hint-size="100%,520px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px"><b style="font-size:16px">Your practice path</b><span style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:#f08a24"><x-import component-from-global-scope="GLIcon" n="flame" s="14" c="#f08a24" hint-size="14px,14px"></x-import>{{ pr.streakLabel }}</span></div>
+    <p style="margin:0 0 16px;color:var(--gl-muted);font-size:13px">A few minutes a day with Lumi. Each step uses your saved words and your goal. Tap one to start.</p>
+    <div style="display:grid;gap:10px">
+      <sc-for list="{{ pr.nodes }}" as="nd" hint-placeholder-count="0">
+        <button sc-camel-on-click="{{ nd.go }}" style="display:flex;gap:14px;align-items:center;padding:12px 14px;border-radius:16px;border:1.5px solid {{ nd.bd }};background:{{ nd.bg }};color:var(--gl-ink);cursor:pointer;text-align:left;transition:transform .2s var(--gl-ease-spring)" style-hover="transform:translateY(-2px)">
+          <span style="width:46px;height:46px;flex:none;border-radius:50%;background:{{ nd.iconBg }};color:{{ nd.iconFg }};display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="{{ nd.icon }}" s="22" hint-size="22px,22px"></x-import></span>
+          <span style="flex:1;min-width:0;line-height:1.35"><b style="display:block;font-size:14.5px">{{ nd.label }}</b><span style="font-size:12.5px;color:var(--gl-muted)">{{ nd.sub }}</span></span>
+          <span style="font-size:11px;font-weight:800;letter-spacing:.06em;color:{{ nd.stateFg }}">{{ nd.state }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </x-import></sc-if>
   <x-import component-from-global-scope="GlobalLinkUI.Card" padding="md" hint-size="100%,560px">
     <div style="display:flex;flex-direction:column;height:520px">
       <div style="display:flex;gap:12px;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--gl-line)">
@@ -1170,7 +1183,7 @@ input,textarea{font-family:inherit}
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--gl-muted)">
             <span style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;background:var(--gl-tint);color:var(--gl-link);font-weight:700;white-space:nowrap"><x-import component-from-global-scope="GLIcon" n="{{ tk.icon }}" s="13" hint-size="13px,13px"></x-import>{{ tk.kind }}</span>
             <span style="white-space:nowrap">{{ tk.cls }}</span><span>·</span>
-            <span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap"><sc-if value="{{ tk.isPrivate }}"><x-import component-from-global-scope="GLIcon" n="lock" s="13" hint-size="13px,13px"></x-import></sc-if><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ tk.mentor }}" src="{{ tk.photo }}" size="{{ 18 }}" hint-size="18px,18px"></x-import>{{ tk.mentor }}</span>
+            <span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap"><sc-if value="{{ tk.isPrivate }}"><x-import component-from-global-scope="GLIcon" n="lock" s="13" hint-size="13px,13px"></x-import></sc-if><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ tk.mentor }}" sc-camel-src="{{ tk.photo }}" size="{{ 18 }}" hint-size="18px,18px"></x-import>{{ tk.mentor }}</span>
           </div>
           <sc-if value="{{ tk.recOn }}">
             <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:var(--gl-error-bg);color:var(--gl-error-ink)">
@@ -1193,7 +1206,7 @@ input,textarea{font-family:inherit}
           <sc-if value="{{ tk.hasDue2 }}"><span style="font-size:11.5px;color:var(--gl-faint);margin-top:-8px;white-space:nowrap">{{ tk.due2 }}</span></sc-if>
           <sc-if value="{{ tk.mine }}"><span style="font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--gl-faint);white-space:nowrap">MADE BY YOU</span></sc-if>
           <sc-if value="{{ tk.hasMats }}"><button sc-camel-on-click="{{ tk.openMats }}" style="display:flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-link);font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap;transition:all .2s" style-hover="border-color:var(--gl-blue-soft);transform:translateY(-1px)"><x-import component-from-global-scope="GLIcon" n="folder-open" s="14" hint-size="14px,14px"></x-import>{{ tk.matsLabel }}</button></sc-if>
-          <sc-if value="{{ tk.recIdle }}"><x-import component-from-global-scope="GlobalLinkUI.Button" variant="soft" size="sm" sc-camel-on-click="{{ startTaskRec }}" hint-size="110px,38px">Record</x-import></sc-if>
+          <sc-if value="{{ tk.recIdle }}"><x-import component-from-global-scope="GlobalLinkUI.Button" variant="soft" size="sm" sc-camel-on-click="{{ tk.startRec }}" hint-size="110px,38px">Record</x-import></sc-if>
         </div>
       </div>
     </sc-for>
@@ -1228,7 +1241,7 @@ input,textarea{font-family:inherit}
           </span>
           <sc-if value="{{ mt.hasProg }}"><span style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gl-muted)"><span style="flex:1;height:5px;border-radius:9px;background:var(--gl-line);overflow:hidden"><span style="display:block;height:100%;width:{{ mt.prog }}%;background:var(--gl-grad-primary);border-radius:9px"></span></span>{{ mt.prog }}%</span></sc-if>
         </div></sc-if>
-        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gl-faint);border-top:1px solid var(--gl-line);padding-top:12px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ mt.fromName }}" src="{{ mt.photo }}" size="{{ 22 }}" hint-size="22px,22px"></x-import>{{ mt.fromName }} · {{ mt.date }}</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--gl-faint);border-top:1px solid var(--gl-line);padding-top:12px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ mt.fromName }}" sc-camel-src="{{ mt.photo }}" size="{{ 22 }}" hint-size="22px,22px"></x-import>{{ mt.fromName }} · {{ mt.date }}</div>
       </button>
     </sc-for>
   </div>
@@ -1329,7 +1342,7 @@ input,textarea{font-family:inherit}
       <div><b style="font-size:15px">What your students paid for</b><div style="font-size:12px;color:var(--gl-muted)">From their plans on globallink.com</div></div>
       <sc-for list="{{ libPlans }}" as="pl" hint-placeholder-count="4">
         <div style="display:grid;gap:8px;padding:12px;border-radius:14px;background:var(--gl-soft)">
-          <div style="display:flex;gap:10px;align-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ pl.name }}" src="{{ pl.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import><span style="flex:1;min-width:0;line-height:1.3"><b style="font-size:13px;display:block">{{ pl.name }}</b><span style="font-size:11.5px;color:var(--gl-muted)">{{ pl.plan }}</span></span><span style="font-family:var(--gl-font-mono);font-size:11.5px;font-weight:700;color:{{ pl.leftFg }};white-space:nowrap">{{ pl.left }}</span></div>
+          <div style="display:flex;gap:10px;align-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ pl.name }}" sc-camel-src="{{ pl.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import><span style="flex:1;min-width:0;line-height:1.3"><b style="font-size:13px;display:block">{{ pl.name }}</b><span style="font-size:11.5px;color:var(--gl-muted)">{{ pl.plan }}</span></span><span style="font-family:var(--gl-font-mono);font-size:11.5px;font-weight:700;color:{{ pl.leftFg }};white-space:nowrap">{{ pl.left }}</span></div>
           <div style="height:5px;border-radius:9px;background:var(--gl-line);overflow:hidden"><div style="height:100%;width:{{ pl.pct }}%;background:var(--gl-grad-primary);border-radius:9px"></div></div>
           <div style="display:flex;gap:5px;flex-wrap:wrap"><sc-for list="{{ pl.packs }}" as="pp" hint-placeholder-count="2"><span style="padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;background:var(--gl-card);border:1px solid var(--gl-line);color:var(--gl-muted)">{{ pp.l }}</span></sc-for></div>
         </div>
@@ -1344,7 +1357,7 @@ input,textarea{font-family:inherit}
         <span style="width:42px;height:42px;flex:none;border-radius:13px;background:var(--gl-tint);color:var(--gl-blue);display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="{{ as.icon }}" s="20" hint-size="20px,20px"></x-import></span>
         <span style="flex:1;min-width:200px;line-height:1.35"><b style="display:block;font-size:14px">{{ as.title }}</b><span style="font-size:12px;color:var(--gl-muted)">Assigned {{ as.when }} · due {{ as.due }}</span><sc-if value="{{ as.hasNote }}"><span style="display:block;font-size:12px;color:var(--gl-faint);font-style:italic">“{{ as.note }}”</span></sc-if></span>
         <span style="display:flex;gap:6px;flex-wrap:wrap">
-          <sc-for list="{{ as.people }}" as="pe" hint-placeholder-count="2"><span title="{{ pe.status }}" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 3px;border-radius:999px;background:var(--gl-soft);font-size:12px;font-weight:700"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ pe.name }}" src="{{ pe.photo }}" size="{{ 24 }}" hint-size="24px,24px"></x-import>{{ pe.first }}<span style="width:7px;height:7px;border-radius:50%;background:{{ pe.dot }}"></span></span></sc-for>
+          <sc-for list="{{ as.people }}" as="pe" hint-placeholder-count="2"><span title="{{ pe.status }}" style="display:flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 3px;border-radius:999px;background:var(--gl-soft);font-size:12px;font-weight:700"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ pe.name }}" sc-camel-src="{{ pe.photo }}" size="{{ 24 }}" hint-size="24px,24px"></x-import>{{ pe.first }}<span style="width:7px;height:7px;border-radius:50%;background:{{ pe.dot }}"></span></span></sc-for>
         </span>
         <span style="display:flex;gap:6px">
           <button sc-camel-on-click="{{ as.remind }}" style="height:32px;padding:0 12px;border-radius:9px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);font-weight:700;font-size:12.5px;cursor:pointer" style-hover="border-color:var(--gl-blue-soft);color:var(--gl-blue)">Remind</button>
@@ -1432,7 +1445,7 @@ input,textarea{font-family:inherit}
       <div style="display:grid;grid-template-columns:minmax(200px,2fr) 96px minmax(150px,1.4fr) 110px 110px 36px;gap:10px;padding:12px 16px;border-bottom:1px solid var(--gl-line);font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--gl-faint)"><span>NAME</span><span>ROLE</span><span>PLAN</span><span>STATUS</span><span>LAST SEEN</span><span></span></div>
       <sc-for list="{{ aUsers }}" as="u" hint-placeholder-count="8">
         <button sc-camel-on-click="{{ u.open }}" style="width:100%;display:grid;grid-template-columns:minmax(200px,2fr) 96px minmax(150px,1.4fr) 110px 110px 36px;gap:10px;align-items:center;padding:10px 16px;border:0;border-bottom:1px solid var(--gl-line);background:{{ u.rowBg }};color:var(--gl-ink);cursor:pointer;text-align:left;transition:background .2s" style-hover="background:var(--gl-soft)">
-          <span style="display:flex;gap:10px;align-items:center;min-width:0"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.name }}" src="{{ u.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import><span style="min-width:0;line-height:1.3"><b style="font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.name }}</b><span style="font-size:11.5px;color:var(--gl-muted)">{{ u.loc }}</span></span></span>
+          <span style="display:flex;gap:10px;align-items:center;min-width:0"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ u.name }}" sc-camel-src="{{ u.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import><span style="min-width:0;line-height:1.3"><b style="font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.name }}</b><span style="font-size:11.5px;color:var(--gl-muted)">{{ u.loc }}</span></span></span>
           <span><span style="padding:2px 9px;border-radius:999px;font-size:11.5px;font-weight:800;background:{{ u.roleBg }};color:{{ u.roleFg }}">{{ u.role }}</span></span>
           <span style="font-size:12.5px;color:var(--gl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.plan }}</span>
           <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700"><span style="width:8px;height:8px;border-radius:50%;background:{{ u.dot }}"></span>{{ u.status }}</span>
@@ -1451,7 +1464,7 @@ input,textarea{font-family:inherit}
   <sc-for list="{{ aMq }}" as="q" hint-placeholder-count="3">
     <div style="padding:18px;border-radius:var(--gl-r-card);background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:12px;animation:gl-rise .4s var(--gl-ease-out)">
       <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.name }}" src="{{ q.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.name }}" sc-camel-src="{{ q.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
         <span style="flex:1;min-width:200px;line-height:1.35"><b style="font-size:14.5px;display:block">{{ q.name }} wants {{ q.subj }}</b><span style="font-size:12px;color:var(--gl-muted)">{{ q.sub }} · free {{ q.times }}</span></span>
         <span style="font-size:12px;font-weight:700;color:{{ q.waitFg }};white-space:nowrap">Waiting {{ q.wait }}</span>
       </div>
@@ -1461,7 +1474,7 @@ input,textarea{font-family:inherit}
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <sc-for list="{{ q.sugg }}" as="sg" hint-placeholder-count="3">
             <button sc-camel-on-click="{{ sg.assign }}" title="Assign {{ sg.first }}" style="display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border-radius:14px;border:1.5px solid var(--gl-line);background:var(--gl-soft);color:var(--gl-ink);cursor:pointer;text-align:left;transition:all .2s var(--gl-ease-spring)" style-hover="border-color:var(--gl-blue);transform:translateY(-2px)">
-              <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ sg.name }}" src="{{ sg.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>
+              <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ sg.name }}" sc-camel-src="{{ sg.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>
               <span style="line-height:1.25"><b style="font-size:12.5px;display:block">{{ sg.first }} · {{ sg.fit }}% fit</b><span style="font-size:11px;color:var(--gl-muted)">{{ sg.why }}</span></span>
             </button>
           </sc-for>
@@ -1498,7 +1511,43 @@ input,textarea{font-family:inherit}
 </sc-if>
 
 <sc-if value="{{ P.a_payments }}">
-<div data-screen-label="Admin payments" style="display:grid;place-items:center;min-height:320px;border:1px dashed var(--gl-line);border-radius:var(--gl-r-card);color:var(--gl-muted);font-size:15px;font-weight:700">To be built</div>
+<sc-if value="{{ DEMO }}"><div data-screen-label="Admin payments" style="display:grid;place-items:center;min-height:320px;border:1px dashed var(--gl-line);border-radius:var(--gl-r-card);color:var(--gl-muted);font-size:15px;font-weight:700">To be built</div></sc-if><sc-if value="{{ LIVE }}"><div data-screen-label="Admin payments" style="display:grid;gap:16px;animation:glPageIn .45s var(--gl-ease-out)">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px">
+    <sc-for list="{{ ap.kpis }}" as="k" hint-placeholder-count="0"><div style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card)"><div style="font-size:11.5px;font-weight:800;letter-spacing:.08em;color:var(--gl-faint)">{{ k.l }}</div><b style="display:block;font-size:24px;letter-spacing:-.02em;margin-top:4px">{{ k.v }}</b><span style="font-size:12px;color:var(--gl-muted)">{{ k.s }}</span></div></sc-for>
+  </div>
+  <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;border:1px dashed var(--gl-line);font-size:12.5px;color:var(--gl-muted)"><x-import component-from-global-scope="GLIcon" n="info" s="15" hint-size="15px,15px"></x-import><span>Most families pay on WeChat. When a payment arrives, confirm the request below (or record it), and their lesson credits appear right away. {{ ap.stripeLine }}</span></div>
+  <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start">
+    <section style="flex:999 1 460px;min-width:0;padding:18px;border-radius:var(--gl-r-card);background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:12px">
+      <b style="font-size:15px">Waiting for payment</b>
+      <sc-for list="{{ ap.pending }}" as="pp" hint-placeholder-count="0"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-radius:12px;background:var(--gl-soft)"><span style="flex:1;min-width:160px;line-height:1.35"><b style="font-size:13.5px">{{ pp.who }}</b><span style="display:block;font-size:12px;color:var(--gl-muted)">{{ pp.what }} · ¥{{ pp.amount }} · #{{ pp.id }} · {{ pp.when }}</span></span><button sc-camel-on-click="{{ pp.confirm }}" style="height:30px;padding:0 12px;border-radius:9px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap;background:var(--gl-success);border-color:var(--gl-success);color:#fff">Payment received</button><button sc-camel-on-click="{{ pp.cancel }}" style="height:30px;padding:0 12px;border-radius:9px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Cancel</button></div></sc-for>
+      <sc-if value="{{ ap.pendingEmpty }}"><span style="font-size:13px;color:var(--gl-muted)">No payment requests waiting.</span></sc-if>
+      <b style="font-size:15px;margin-top:6px">All payments</b>
+      <sc-for list="{{ ap.all }}" as="py" hint-placeholder-count="0"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--gl-line)"><span style="flex:1;min-width:160px;line-height:1.35"><b style="font-size:13px;text-decoration:{{ py.deco }}">{{ py.who }} · {{ py.what }}</b><span style="display:block;font-size:12px;color:var(--gl-muted)">{{ py.method }} · {{ py.when }} · {{ py.credits }} credits</span></span><b style="font-family:var(--gl-font-mono);font-size:13px">¥{{ py.amount }}</b><span style="font-size:11.5px;font-weight:800;color:{{ py.fg }}">{{ py.status }}</span><sc-if value="{{ py.canRefund }}"><button sc-camel-on-click="{{ py.refund }}" style="height:30px;padding:0 12px;border-radius:9px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Refund</button></sc-if></div></sc-for>
+      <sc-if value="{{ ap.allEmpty }}"><span style="font-size:13px;color:var(--gl-muted)">No payments yet.</span></sc-if>
+    </section>
+    <div style="flex:1 1 300px;min-width:0;display:grid;gap:16px">
+      <section style="padding:18px;border-radius:var(--gl-r-card);background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:12px">
+        <b style="font-size:15px">Record a WeChat payment</b>
+        <span style="font-size:12.5px;color:var(--gl-muted)">For payments that came in without a request in the app.</span>
+        <x-import component-from-global-scope="GlobalLinkUI.Select" options="{{ ap.studentOpts }}" value="{{ ap.recUser }}" sc-camel-on-change="{{ ap.setRecUser }}" placeholder="Choose a student…" hint-size="100%,40px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Select" options="{{ ap.packOpts }}" value="{{ ap.recPack }}" sc-camel-on-change="{{ ap.setRecPack }}" placeholder="Choose a plan…" hint-size="100%,40px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.TextField" label="Amount received (¥)" value="{{ ap.recAmount }}" sc-camel-on-change="{{ ap.setRecAmount }}" hint-size="100%,72px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.TextField" label="Note (optional)" value="{{ ap.recNote }}" sc-camel-on-change="{{ ap.setRecNote }}" placeholder="WeChat transfer from Mrs. Chen" hint-size="100%,72px"></x-import>
+        <div><x-import component-from-global-scope="GlobalLinkUI.Button" variant="primary" size="sm" sc-camel-on-click="{{ ap.record }}" hint-size="150px,38px">Record payment</x-import></div>
+      </section>
+      <section style="padding:18px;border-radius:var(--gl-r-card);background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:12px">
+        <b style="font-size:15px">Plans and prices</b>
+        <sc-for list="{{ aPkgs }}" as="pk" hint-placeholder-count="0"><div style="display:flex;gap:10px;align-items:center;opacity:{{ pk.op }}"><span style="flex:1;min-width:0;font-size:13px;font-weight:700">{{ pk.name }}</span><span style="font-size:12px;color:var(--gl-faint)">¥</span><input value="{{ pk.price }}" sc-camel-on-change="{{ pk.setPrice }}" inputmode="numeric" style="width:76px;min-height:34px;padding:4px 8px;border:1px solid var(--gl-line);border-radius:9px;background:var(--gl-card);color:var(--gl-ink);font:600 13px var(--gl-font-mono)"><button sc-camel-on-click="{{ pk.toggle }}" role="switch" style="width:40px;height:24px;flex:none;border:0;border-radius:999px;background:{{ pk.bg }};position:relative;cursor:pointer"><span style="position:absolute;top:2px;left:{{ pk.x }};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s"></span></button></div></sc-for>
+      </section>
+      <section style="padding:18px;border-radius:var(--gl-r-card);background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:12px">
+        <b style="font-size:15px">Mentor payouts</b>
+        <span style="font-size:12.5px;color:var(--gl-muted)">Finished lessons per month at {{ ap.rateLabel }}.</span>
+        <sc-for list="{{ ap.payouts }}" as="po" hint-placeholder-count="0"><div style="display:flex;gap:10px;align-items:center"><span style="flex:1;min-width:0;line-height:1.3"><b style="font-size:13px">{{ po.name }}</b><span style="display:block;font-size:12px;color:var(--gl-muted)">{{ po.month }} · {{ po.lessons }} lessons</span></span><b style="font-family:var(--gl-font-mono);font-size:13px">&#36;{{ po.amount }}</b><sc-if value="{{ po.paid }}"><span style="font-size:11.5px;font-weight:800;color:var(--gl-success)">PAID</span></sc-if><sc-if value="{{ po.unpaid }}"><button sc-camel-on-click="{{ po.pay }}" style="height:30px;padding:0 12px;border-radius:9px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Mark paid</button></sc-if></div></sc-for>
+        <sc-if value="{{ ap.payoutsEmpty }}"><span style="font-size:13px;color:var(--gl-muted)">No finished lessons yet.</span></sc-if>
+      </section>
+    </div>
+  </div>
+</div></sc-if>
 </sc-if>
 
 <sc-if value="{{ P.a_materials }}">
@@ -1574,6 +1623,11 @@ input,textarea{font-family:inherit}
     <b style="font-size:15px">History</b>
     <sc-for list="{{ annHist }}" as="h" hint-placeholder-count="3"><div style="display:grid;gap:2px;padding:10px 0;border-bottom:1px solid var(--gl-line)"><span style="font-size:13px;font-weight:600">{{ h.t }}</span><span style="font-size:11.5px;color:var(--gl-faint)">{{ h.aud }} · {{ h.when }} · {{ h.state }}</span></div></sc-for>
   </section>
+  <sc-if value="{{ LIVE }}"><section style="flex:1 1 320px;min-width:0;padding:18px;border-radius:var(--gl-r-card);background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-family:var(--gl-font-zh);font-size:12px;font-weight:700;color:#c98a12">社区活动</div><b style="font-size:16px">Community events</b></div><x-import component-from-global-scope="GlobalLinkUI.Button" variant="soft" size="sm" sc-camel-on-click="{{ openEventForm }}" hint-size="150px,38px">Post an event</x-import></div>
+    <sc-for list="{{ aEvents }}" as="ae" hint-placeholder-count="0"><div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--gl-line)"><span style="flex:1;min-width:0;line-height:1.35"><b style="font-size:13px">{{ ae.title }}</b><span style="display:block;font-size:12px;color:var(--gl-muted)">{{ ae.when }} · {{ ae.host }} · {{ ae.going }} going</span></span><button sc-camel-on-click="{{ ae.remove }}" style="height:30px;padding:0 12px;border-radius:9px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap">Remove</button></div></sc-for>
+    <sc-if value="{{ aEventsEmpty }}"><span style="font-size:13px;color:var(--gl-muted)">No upcoming events.</span></sc-if>
+  </section></sc-if>
 </div>
 </sc-if>
 
@@ -1612,7 +1666,7 @@ input,textarea{font-family:inherit}
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px">
       <sc-for list="{{ devAccounts }}" as="d" hint-placeholder-count="4">
         <button sc-camel-on-click="{{ d.go }}" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;border:1px {{ d.bs }} var(--gl-line);background:var(--gl-soft);cursor:pointer;color:var(--gl-ink);text-align:left;transition:transform .2s,box-shadow .2s" style-hover="transform:translateY(-2px);box-shadow:var(--gl-shadow-hover)">
-          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ d.name }}" src="{{ d.photo }}" size="{{ 38 }}" hint-size="38px,38px"></x-import>
+          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ d.name }}" sc-camel-src="{{ d.photo }}" size="{{ 38 }}" hint-size="38px,38px"></x-import>
           <span style="display:grid;line-height:1.25;min-width:0"><b style="font-size:13.5px">{{ d.name }}</b><span style="font-size:12px;color:var(--gl-muted)">{{ d.sub }}</span></span>
         </button>
       </sc-for>
@@ -1632,7 +1686,7 @@ input,textarea{font-family:inherit}
     <sc-if value="{{ isStudentRole }}"><button sc-camel-on-click="{{ goAsk }}" style="width:100%;min-width:0;display:flex;gap:10px;align-items:center;padding:10px;margin-bottom:6px;border-radius:14px;border:1px dashed var(--gl-blue-soft);background:var(--gl-card);color:var(--gl-ink);cursor:pointer;text-align:left;transition:all .2s" style-hover="border-color:var(--gl-blue);transform:translateY(-1px)"><span style="width:40px;height:40px;flex:none;border-radius:50%;background:var(--gl-grad-primary);color:#fff;display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="circle-help" s="19" hint-size="19px,19px"></x-import></span><span style="flex:1;min-width:0;line-height:1.3"><b style="font-size:13.5px;display:block">Ask any mentor</b><span style="font-size:12px;color:var(--gl-muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ askEntrySub }}</span></span></button></sc-if>
     <sc-for list="{{ threads }}" as="th" hint-placeholder-count="4">
       <button sc-camel-on-click="{{ th.pick }}" style="width:100%;min-width:0;display:flex;gap:10px;align-items:center;padding:10px;border:0;border-radius:14px;background:{{ th.bg }};color:var(--gl-ink);cursor:pointer;text-align:left;transition:background .2s" style-hover="background:var(--gl-tint)">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ th.name }}" src="{{ th.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ th.name }}" sc-camel-src="{{ th.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
         <span style="flex:1;min-width:0;line-height:1.3"><span style="display:flex;justify-content:space-between;gap:6px"><b style="font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ th.name }}</b><span style="font-size:11px;color:var(--gl-faint);white-space:nowrap">{{ th.lastTime }}</span></span><span style="display:block;font-size:12.5px;color:var(--gl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ th.last }}</span></span>
         <sc-if value="{{ th.hasUnread }}"><span style="width:9px;height:9px;border-radius:50%;background:var(--gl-blue);flex:none"></span></sc-if>
       </button>
@@ -1640,20 +1694,20 @@ input,textarea{font-family:inherit}
   </div>
   <div style="display:flex;flex-direction:column;min-width:0;min-height:0">
     <div style="display:flex;gap:12px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--gl-line)">
-      <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ thread.name }}" src="{{ thread.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
+      <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ thread.name }}" sc-camel-src="{{ thread.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
       <div style="flex:1;min-width:120px;line-height:1.3"><b style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ thread.name }}</b><div style="font-size:12px;color:var(--gl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ thread.sub }}</div></div>
       <sc-if value="{{ threadHasLocal }}"><span style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--gl-soft);font-size:12px;color:var(--gl-muted);white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis"><x-import component-from-global-scope="GLIcon" n="clock" s="13" hint-size="13px,13px"></x-import>It's {{ thread.local }}</span></sc-if>
     </div>
     <div style="flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:10px;background:var(--gl-bg)">
       <div style="align-self:center;font-size:11.5px;color:var(--gl-faint);padding:4px 12px;border-radius:999px;background:var(--gl-soft);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis">{{ thread.reply }}</div>
       <sc-for list="{{ msgs }}" as="m" hint-placeholder-count="4">
-        <sc-if value="{{ m.them }}"><div style="align-self:flex-start;max-width:72%;animation:gl-rise .3s var(--gl-ease-out)"><div style="padding:10px 14px;border-radius:18px 18px 18px 4px;background:var(--gl-card);border:1px solid var(--gl-line);text-wrap:pretty">{{ m.t }}<sc-if value="{{ m.hasMats }}"><button sc-camel-on-click="{{ m.openMats }}" title="{{ m.matsNames }}" style="margin-top:8px;width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:1px solid var(--gl-line);background:var(--gl-soft);color:var(--gl-ink);cursor:pointer;text-align:left;transition:all .2s" style-hover="border-color:var(--gl-blue-soft);transform:translateY(-1px)"><span style="width:30px;height:30px;flex:none;border-radius:9px;background:var(--gl-tint);color:var(--gl-blue);display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="folder-open" s="15" hint-size="15px,15px"></x-import></span><span style="flex:1;min-width:0;line-height:1.3"><b style="font-size:12.5px;display:block">{{ m.matsLabel }}</b><span style="font-size:11.5px;color:var(--gl-muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.matsNames }}</span></span><x-import component-from-global-scope="GLIcon" n="arrow-right" s="15" c="var(--gl-blue)" hint-size="15px,15px"></x-import></button></sc-if><sc-if value="{{ m.trShow }}"><div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--gl-line);font-family:var(--gl-font-zh);color:var(--gl-muted);font-size:13.5px;line-height:1.55;white-space:pre-line;animation:gl-rise .3s var(--gl-ease-out)">{{ m.trText }}</div></sc-if></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gl-faint);margin:3px 6px 0">{{ m.time }}<sc-if value="{{ m.canTr }}"><span style="opacity:.6">·</span><button sc-camel-on-click="{{ m.trGo }}" title="Translate this message" style="display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:700;color:var(--gl-link);opacity:.75;cursor:pointer;transition:opacity .2s" style-hover="opacity:1;text-decoration:underline"><x-import component-from-global-scope="GLIcon" n="languages" s="11" hint-size="11px,11px"></x-import>{{ m.trLabel }}</button></sc-if></div></div></sc-if>
-        <sc-if value="{{ m.me }}"><div style="align-self:flex-end;max-width:72%;text-align:right;animation:gl-rise .3s var(--gl-ease-out)"><div style="padding:10px 14px;border-radius:18px 18px 4px 18px;background:var(--gl-grad-cta);color:#fff;text-align:left;text-wrap:pretty">{{ m.t }}</div><div style="font-size:11px;color:var(--gl-faint);margin:3px 6px 0">{{ m.time }}</div></div></sc-if>
+        <sc-if value="{{ m.them }}"><div style="align-self:flex-start;max-width:72%;animation:gl-rise .3s var(--gl-ease-out)"><div style="padding:10px 14px;border-radius:18px 18px 18px 4px;background:var(--gl-card);border:1px solid var(--gl-line);text-wrap:pretty">{{ m.t }}<sc-if value="{{ m.hasFile }}"><span style="display:block;margin-top:8px"><sc-if value="{{ m.isAudio }}"><audio sc-camel-src="{{ m.fileUrl }}" controls preload="none" style="width:230px;max-width:100%;height:38px"></audio></sc-if><sc-if value="{{ m.isImage }}"><a href="{{ m.fileUrl }}" target="_blank" rel="noopener"><img sc-camel-src="{{ m.fileUrl }}" alt="" style="display:block;max-width:220px;max-height:220px;border-radius:12px"></a></sc-if><sc-if value="{{ m.isVideo }}"><video sc-camel-src="{{ m.fileUrl }}" controls preload="metadata" playsinline style="display:block;max-width:240px;border-radius:12px"></video></sc-if><sc-if value="{{ m.isDoc }}"><a href="{{ m.fileUrl }}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;font-weight:700">📎 {{ m.fileName }}</a></sc-if></span></sc-if><sc-if value="{{ m.hasMats }}"><button sc-camel-on-click="{{ m.openMats }}" title="{{ m.matsNames }}" style="margin-top:8px;width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;border:1px solid var(--gl-line);background:var(--gl-soft);color:var(--gl-ink);cursor:pointer;text-align:left;transition:all .2s" style-hover="border-color:var(--gl-blue-soft);transform:translateY(-1px)"><span style="width:30px;height:30px;flex:none;border-radius:9px;background:var(--gl-tint);color:var(--gl-blue);display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="folder-open" s="15" hint-size="15px,15px"></x-import></span><span style="flex:1;min-width:0;line-height:1.3"><b style="font-size:12.5px;display:block">{{ m.matsLabel }}</b><span style="font-size:11.5px;color:var(--gl-muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.matsNames }}</span></span><x-import component-from-global-scope="GLIcon" n="arrow-right" s="15" c="var(--gl-blue)" hint-size="15px,15px"></x-import></button></sc-if><sc-if value="{{ m.trShow }}"><div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--gl-line);font-family:var(--gl-font-zh);color:var(--gl-muted);font-size:13.5px;line-height:1.55;white-space:pre-line;animation:gl-rise .3s var(--gl-ease-out)">{{ m.trText }}</div></sc-if></div><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gl-faint);margin:3px 6px 0">{{ m.time }}<sc-if value="{{ m.canTr }}"><span style="opacity:.6">·</span><button sc-camel-on-click="{{ m.trGo }}" title="Translate this message" style="display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:700;color:var(--gl-link);opacity:.75;cursor:pointer;transition:opacity .2s" style-hover="opacity:1;text-decoration:underline"><x-import component-from-global-scope="GLIcon" n="languages" s="11" hint-size="11px,11px"></x-import>{{ m.trLabel }}</button></sc-if></div></div></sc-if>
+        <sc-if value="{{ m.me }}"><div style="align-self:flex-end;max-width:72%;text-align:right;animation:gl-rise .3s var(--gl-ease-out)"><div style="padding:10px 14px;border-radius:18px 18px 4px 18px;background:var(--gl-grad-cta);color:#fff;text-align:left;text-wrap:pretty">{{ m.t }}<sc-if value="{{ m.hasFile }}"><span style="display:block;margin-top:8px"><sc-if value="{{ m.isAudio }}"><audio sc-camel-src="{{ m.fileUrl }}" controls preload="none" style="width:230px;max-width:100%;height:38px"></audio></sc-if><sc-if value="{{ m.isImage }}"><a href="{{ m.fileUrl }}" target="_blank" rel="noopener"><img sc-camel-src="{{ m.fileUrl }}" alt="" style="display:block;max-width:220px;max-height:220px;border-radius:12px"></a></sc-if><sc-if value="{{ m.isVideo }}"><video sc-camel-src="{{ m.fileUrl }}" controls preload="metadata" playsinline style="display:block;max-width:240px;border-radius:12px"></video></sc-if><sc-if value="{{ m.isDoc }}"><a href="{{ m.fileUrl }}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;font-weight:700">📎 {{ m.fileName }}</a></sc-if></span></sc-if></div><div style="font-size:11px;color:var(--gl-faint);margin:3px 6px 0">{{ m.time }}</div></div></sc-if>
       </sc-for>
       <sc-if value="{{ typing }}"><div style="align-self:flex-start;padding:12px 16px;border-radius:18px 18px 18px 4px;background:var(--gl-card);border:1px solid var(--gl-line);display:flex;gap:4px"><span style="width:7px;height:7px;border-radius:50%;background:var(--gl-faint);animation:gl-dots 1.2s infinite"></span><span style="width:7px;height:7px;border-radius:50%;background:var(--gl-faint);animation:gl-dots 1.2s .2s infinite"></span><span style="width:7px;height:7px;border-radius:50%;background:var(--gl-faint);animation:gl-dots 1.2s .4s infinite"></span></div></sc-if>
     </div>
     <div style="display:flex;gap:8px;padding:12px;border-top:1px solid var(--gl-line)">
-      <button title="Attach" style="width:44px;height:44px;border-radius:12px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-muted);cursor:pointer;display:grid;place-items:center" style-hover="color:var(--gl-blue);background:var(--gl-tint)"><x-import component-from-global-scope="GLIcon" n="paperclip" s="17" hint-size="17px,17px"></x-import></button>
+      <button sc-camel-on-click="{{ attachFile }}" title="Attach" style="width:44px;height:44px;border-radius:12px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-muted);cursor:pointer;display:grid;place-items:center" style-hover="color:var(--gl-blue);background:var(--gl-tint)"><x-import component-from-global-scope="GLIcon" n="paperclip" s="17" hint-size="17px,17px"></x-import></button>
       <input value="{{ draft }}" sc-camel-on-change="{{ setDraft }}" sc-camel-on-key-down="{{ msgKey }}" placeholder="Write a message…" style="flex:1;height:44px;padding:0 14px;border-radius:12px;border:1px solid var(--gl-line);background:var(--gl-soft);color:var(--gl-ink);font-size:14px;outline:0;min-width:0" style-focus="border-color:var(--gl-blue);box-shadow:0 0 0 3px rgba(47,140,243,.15)">
       <button sc-camel-on-click="{{ sendMsg }}" title="Send" style="width:44px;height:44px;border-radius:12px;border:0;background:var(--gl-grad-cta);color:#fff;cursor:pointer;display:grid;place-items:center;transition:transform .15s" style-active="transform:scale(.92)"><x-import component-from-global-scope="GLIcon" n="send" s="17" hint-size="17px,17px"></x-import></button>
     </div>
@@ -1674,7 +1728,7 @@ input,textarea{font-family:inherit}
         <sc-if value="{{ q.waiting }}">
           <span style="position:relative;width:56px;height:56px;flex:none;display:grid;place-items:center">
             <svg width="56" height="56" sc-camel-view-box="0 0 40 40" style="transform:rotate(-90deg);position:absolute;inset:0"><circle cx="20" cy="20" r="16" fill="none" style="stroke:var(--gl-line);stroke-width:3"></circle><circle cx="20" cy="20" r="16" fill="none" style="stroke:var(--gl-blue);stroke-width:3;stroke-linecap:round;stroke-dasharray:{{ q.dash }};transition:stroke-dasharray .6s"></circle></svg>
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.mentor }}" src="{{ q.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.mentor }}" sc-camel-src="{{ q.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
           </span>
         </sc-if>
         <div style="flex:1;min-width:220px;display:grid;gap:4px">
@@ -1698,7 +1752,7 @@ input,textarea{font-family:inherit}
             <div style="font-size:12px;color:var(--gl-faint)">{{ sq.from }} asked {{ sq.mentor }}</div>
             <b style="font-size:15px;line-height:1.35">"{{ sq.q }}"</b>
             <div style="display:flex;gap:10px;align-items:flex-start">
-              <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ sq.mentor }}" src="{{ sq.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>
+              <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ sq.mentor }}" sc-camel-src="{{ sq.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>
               <div style="flex:1;padding:10px 12px;border-radius:4px 16px 16px 16px;background:var(--gl-soft);font-size:13.5px;text-wrap:pretty">{{ sq.ans }}<sc-if value="{{ sq.trShow }}"><div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--gl-line);font-family:var(--gl-font-zh);color:var(--gl-muted);font-size:13.5px;line-height:1.55;white-space:pre-line;animation:gl-rise .3s var(--gl-ease-out)">{{ sq.trText }}</div></sc-if><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gl-faint);margin-top:6px"><sc-if value="{{ sq.canTr }}"><button sc-camel-on-click="{{ sq.trGo }}" title="Translate this message" style="display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:700;color:var(--gl-link);opacity:.75;cursor:pointer;transition:opacity .2s" style-hover="opacity:1;text-decoration:underline"><x-import component-from-global-scope="GLIcon" n="languages" s="11" hint-size="11px,11px"></x-import>{{ sq.trLabel }}</button></sc-if></div></div>
             </div>
             <sc-if value="{{ sq.isVideo }}"><button sc-camel-on-click="{{ sq.play }}" style="justify-self:start;display:flex;align-items:center;gap:8px;border:0;background:none;color:var(--gl-link);font-weight:700;cursor:pointer;padding:0"><x-import component-from-global-scope="GLIcon" n="circle-play" s="16" hint-size="16px,16px"></x-import>Watch reply · {{ sq.len }}</button></sc-if>
@@ -1894,7 +1948,7 @@ input,textarea{font-family:inherit}
   <div style="flex:999 1 420px;min-width:0;max-width:780px;display:grid;gap:16px">
     <sc-if value="{{ ST.account }}">
       <div style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:flex;gap:16px;align-items:center;flex-wrap:wrap;animation:gl-rise .35s var(--gl-ease-out)">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" src="{{ me.photo }}" size="{{ 64 }}" hint-size="64px,64px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" sc-camel-src="{{ me.photo }}" size="{{ 64 }}" hint-size="64px,64px"></x-import>
         <div style="flex:1;min-width:200px"><b style="font-size:18px">{{ me.name }}</b><div style="font-size:13px;color:var(--gl-muted)">@{{ username }} · {{ emailShown }}</div><div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gl-success);margin-top:4px"><x-import component-from-global-scope="GLIcon" n="refresh-cw" s="12" hint-size="12px,12px"></x-import>Synced with globallink.com just now</div></div>
         <a href="#" style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px">Edit on the website<x-import component-from-global-scope="GLIcon" n="external-link" s="13" hint-size="13px,13px"></x-import></a>
       </div>
@@ -1906,6 +1960,7 @@ input,textarea{font-family:inherit}
           <sc-if value="{{ LIVE }}"><sc-if value="{{ isStudentRole }}">
             <x-import component-from-global-scope="GlobalLinkUI.TextField" label="My goal" multiline="{{ true }}" value="{{ goalText }}" sc-camel-on-change="{{ setGoal }}" placeholder="Speak confidently in my first college interview." hint="Your mentors see this. Saved automatically." hint-size="100%,140px"></x-import>
             <x-import component-from-global-scope="GlobalLinkUI.TextField" label="Interests" value="{{ interestsText }}" sc-camel-on-change="{{ setInterests }}" placeholder="Hiking, photography, baking" hint="Separate with commas. Mentors use these to plan lessons." hint-size="100%,90px"></x-import>
+            <sc-if value="{{ isStudentRole }}"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border-radius:14px;background:var(--gl-soft);border:1px solid var(--gl-line)"><span style="color:var(--gl-blue)"><x-import component-from-global-scope="GLIcon" n="ticket" s="20" hint-size="20px,20px"></x-import></span><span style="flex:1;min-width:160px;line-height:1.35"><b style="font-size:14px">{{ buy.credits }} lesson credit(s)</b><span style="display:block;font-size:12px;color:var(--gl-muted)">{{ buy.packsLabel }}</span></span><x-import component-from-global-scope="GlobalLinkUI.Button" variant="soft" size="sm" sc-camel-on-click="{{ openBuy }}" hint-size="150px,38px">Buy lessons</x-import></div></sc-if>
           </sc-if><sc-if value="{{ isTutorRole }}">
             <x-import component-from-global-scope="GlobalLinkUI.TextField" label="What I teach" value="{{ teachesText }}" sc-camel-on-change="{{ setTeaches }}" placeholder="English conversation, IELTS, SAT math" hint="Used to match you with students. Separate with commas." hint-size="100%,90px"></x-import>
             <x-import component-from-global-scope="GlobalLinkUI.TextField" label="Why I mentor" multiline="{{ true }}" value="{{ whyText }}" sc-camel-on-change="{{ setWhy }}" placeholder="I love helping students feel comfortable speaking English." hint="Students see this on your card. Saved automatically." hint-size="100%,140px"></x-import>
@@ -2002,7 +2057,7 @@ input,textarea{font-family:inherit}
     <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><b style="font-size:16px">Requests</b><div style="font-size:13px;color:var(--gl-muted)">Mentors you asked for on the website or here. We usually match within two days.</div></div><x-import component-from-global-scope="GlobalLinkUI.Button" variant="primary" size="sm" sc-camel-on-click="{{ openReq }}" hint-size="170px,38px">Request a mentor</x-import></div>
     <sc-for list="{{ pendingReqs }}" as="r" hint-placeholder-count="1">
       <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:14px;border-radius:16px;background:var(--gl-soft);animation:gl-rise .4s var(--gl-ease-out)">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ r.name }}" src="{{ r.photo }}" size="{{ 44 }}" hint-size="44px,44px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ r.name }}" sc-camel-src="{{ r.photo }}" size="{{ 44 }}" hint-size="44px,44px"></x-import>
         <div style="flex:1;min-width:180px;line-height:1.35"><b>{{ r.name }}</b><div style="font-size:12.5px;color:var(--gl-muted)">{{ r.subj }} · requested {{ r.date }} {{ r.via }}</div></div>
         <div style="position:relative;width:220px;flex:none">
           <div style="position:absolute;left:35px;right:35px;top:7px;height:3px;border-radius:3px;background:var(--gl-line)"><div style="height:100%;width:{{ r.pct }}%;background:var(--gl-grad-primary);border-radius:3px;transition:width .8s var(--gl-ease-out)"></div></div>
@@ -2110,7 +2165,7 @@ input,textarea{font-family:inherit}
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px">
         <sc-for list="{{ topPosts }}" as="tp" hint-placeholder-count="3">
           <button sc-camel-on-click="{{ tp.open }}" style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:10px;color:var(--gl-ink);cursor:pointer;text-align:left;align-content:start;transition:transform .25s var(--gl-ease-spring),box-shadow .25s" style-hover="transform:translateY(-3px);box-shadow:var(--gl-shadow-hover)">
-            <span style="display:flex;align-items:center;gap:8px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ tp.author }}" src="{{ tp.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import><span style="min-width:0;line-height:1.2"><b style="font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tp.author }}</b><span style="font-size:11px;color:var(--gl-faint)">{{ tp.time }}</span></span></span>
+            <span style="display:flex;align-items:center;gap:8px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ tp.author }}" sc-camel-src="{{ tp.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import><span style="min-width:0;line-height:1.2"><b style="font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ tp.author }}</b><span style="font-size:11px;color:var(--gl-faint)">{{ tp.time }}</span></span></span>
             <b style="font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">{{ tp.title }}</b>
             <span style="display:flex;gap:12px;font-size:12px;color:var(--gl-muted)"><span style="display:flex;align-items:center;gap:4px"><x-import component-from-global-scope="GLIcon" n="heart" s="13" hint-size="13px,13px"></x-import>{{ tp.likeN }}</span><span style="display:flex;align-items:center;gap:4px"><x-import component-from-global-scope="GLIcon" n="message-circle" s="13" hint-size="13px,13px"></x-import>{{ tp.cmN }}</span></span>
           </button>
@@ -2124,7 +2179,7 @@ input,textarea{font-family:inherit}
       <sc-for list="{{ feed }}" as="po" hint-placeholder-count="4">
         <article style="padding:18px;border-radius:20px;background:var(--gl-card);border:1.5px solid {{ po.bd }};box-shadow:var(--gl-shadow-card);display:grid;gap:12px;animation:gl-rise .45s var(--gl-ease-out);transition:border-color .6s">
           <div style="display:flex;gap:12px;align-items:center">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ po.author }}" src="{{ po.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ po.author }}" sc-camel-src="{{ po.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
             <div style="flex:1;min-width:0;line-height:1.3"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><b>{{ po.author }}</b><sc-if value="{{ po.mentor }}"><x-import component-from-global-scope="GlobalLinkUI.Badge" tone="tint" hint-size="60px,20px">Mentor</x-import></sc-if></div><div style="font-size:12px;color:var(--gl-muted)">{{ po.sub }} · in <b style="color:var(--gl-link)">{{ po.group }}</b> · {{ po.time }}</div></div>
             <x-import component-from-global-scope="GlobalLinkUI.Badge" tone="{{ po.tone }}" hint-size="80px,22px">{{ po.type }}</x-import>
           </div>
@@ -2142,9 +2197,9 @@ input,textarea{font-family:inherit}
           <sc-if value="{{ po.cmOpen }}">
             <div style="display:grid;gap:10px;animation:gl-rise .3s var(--gl-ease-out)">
               <sc-for list="{{ po.comments }}" as="cm" hint-placeholder-count="1">
-                <div style="display:flex;gap:10px;align-items:flex-start"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ cm.who }}" src="{{ cm.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import><div style="flex:1;padding:9px 12px;border-radius:4px 14px 14px 14px;background:var(--gl-soft);font-size:13.5px"><b style="font-size:12.5px">{{ cm.who }}</b><sc-if value="{{ cm.mentor }}"><span style="font-size:11px;font-weight:800;color:var(--gl-blue);margin-left:6px">MENTOR</span></sc-if><div>{{ cm.t }}</div><sc-if value="{{ cm.trShow }}"><div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--gl-line);font-family:var(--gl-font-zh);color:var(--gl-muted);font-size:13.5px;line-height:1.55;white-space:pre-line;animation:gl-rise .3s var(--gl-ease-out)">{{ cm.trText }}</div></sc-if><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gl-faint);margin-top:4px"><sc-if value="{{ cm.canTr }}"><button sc-camel-on-click="{{ cm.trGo }}" title="Translate this message" style="display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:700;color:var(--gl-link);opacity:.75;cursor:pointer;transition:opacity .2s" style-hover="opacity:1;text-decoration:underline"><x-import component-from-global-scope="GLIcon" n="languages" s="11" hint-size="11px,11px"></x-import>{{ cm.trLabel }}</button></sc-if></div></div></div>
+                <div style="display:flex;gap:10px;align-items:flex-start"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ cm.who }}" sc-camel-src="{{ cm.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import><div style="flex:1;padding:9px 12px;border-radius:4px 14px 14px 14px;background:var(--gl-soft);font-size:13.5px"><b style="font-size:12.5px">{{ cm.who }}</b><sc-if value="{{ cm.mentor }}"><span style="font-size:11px;font-weight:800;color:var(--gl-blue);margin-left:6px">MENTOR</span></sc-if><div>{{ cm.t }}</div><sc-if value="{{ cm.trShow }}"><div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--gl-line);font-family:var(--gl-font-zh);color:var(--gl-muted);font-size:13.5px;line-height:1.55;white-space:pre-line;animation:gl-rise .3s var(--gl-ease-out)">{{ cm.trText }}</div></sc-if><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--gl-faint);margin-top:4px"><sc-if value="{{ cm.canTr }}"><button sc-camel-on-click="{{ cm.trGo }}" title="Translate this message" style="display:inline-flex;align-items:center;gap:4px;padding:0;border:0;background:none;font:inherit;font-weight:700;color:var(--gl-link);opacity:.75;cursor:pointer;transition:opacity .2s" style-hover="opacity:1;text-decoration:underline"><x-import component-from-global-scope="GLIcon" n="languages" s="11" hint-size="11px,11px"></x-import>{{ cm.trLabel }}</button></sc-if></div></div></div>
               </sc-for>
-              <div style="display:flex;gap:8px;align-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" src="{{ me.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import><input value="{{ cmDraft }}" sc-camel-on-change="{{ setCmDraft }}" sc-camel-on-key-down="{{ po.cmKey }}" placeholder="Write a kind reply…" style="flex:1;min-width:0;height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--gl-line);background:var(--gl-soft);color:var(--gl-ink);font-size:13.5px;outline:0" style-focus="border-color:var(--gl-blue)"><button sc-camel-on-click="{{ po.addCm }}" title="Send" style="width:38px;height:38px;border:0;border-radius:10px;background:var(--gl-grad-cta);color:#fff;cursor:pointer;display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="send" s="15" hint-size="15px,15px"></x-import></button></div>
+              <div style="display:flex;gap:8px;align-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" sc-camel-src="{{ me.photo }}" size="{{ 28 }}" hint-size="28px,28px"></x-import><input value="{{ cmDraft }}" sc-camel-on-change="{{ setCmDraft }}" sc-camel-on-key-down="{{ po.cmKey }}" placeholder="Write a kind reply…" style="flex:1;min-width:0;height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--gl-line);background:var(--gl-soft);color:var(--gl-ink);font-size:13.5px;outline:0" style-focus="border-color:var(--gl-blue)"><button sc-camel-on-click="{{ po.addCm }}" title="Send" style="width:38px;height:38px;border:0;border-radius:10px;background:var(--gl-grad-cta);color:#fff;cursor:pointer;display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="send" s="15" hint-size="15px,15px"></x-import></button></div>
             </div>
           </sc-if>
         </article>
@@ -2155,7 +2210,7 @@ input,textarea{font-family:inherit}
       <div style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);padding:0;overflow:hidden;text-align:center;grid-row:span 2">
         <div style="height:64px;background:var(--gl-grad-primary)"></div>
         <div style="margin-top:-32px;display:grid;justify-items:center;gap:6px;padding:0 16px 18px">
-          <span style="border-radius:50%;box-shadow:0 0 0 4px var(--gl-card)"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" src="{{ me.photo }}" size="{{ 64 }}" hint-size="64px,64px"></x-import></span>
+          <span style="border-radius:50%;box-shadow:0 0 0 4px var(--gl-card)"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" sc-camel-src="{{ me.photo }}" size="{{ 64 }}" hint-size="64px,64px"></x-import></span>
           <b style="font-size:16px">{{ me.name }}</b><span style="font-size:12.5px;color:var(--gl-muted);display:flex;align-items:center;gap:4px"><x-import component-from-global-scope="GLIcon" n="map-pin" s="13" hint-size="13px,13px"></x-import>{{ me.sub }}</span>
           <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:4px 0"><sc-for list="{{ wInterests }}" as="wi" hint-placeholder-count="3"><span style="padding:3px 9px;border-radius:999px;background:var(--gl-tint);color:var(--gl-link);font-weight:700;font-size:11.5px">{{ wi.t }}</span></sc-for></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;width:100%;border-top:1px solid var(--gl-line);padding-top:10px;margin-top:4px"><div><b style="font-family:var(--gl-font-mono);font-size:17px">{{ myPostCount }}</b><div style="font-size:11.5px;color:var(--gl-faint)">posts</div></div><div><b style="font-family:var(--gl-font-mono);font-size:17px">{{ joinedCount }}</b><div style="font-size:11.5px;color:var(--gl-faint)">groups</div></div></div>
@@ -2164,7 +2219,7 @@ input,textarea{font-family:inherit}
       </div>
       <div style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:12px">
         <b style="font-size:15px">{{ askCardTitle }}</b>
-        <div style="display:flex;gap:12px;align-items:center"><span style="position:relative"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ askCardName }}" src="{{ askCardPhoto }}" size="{{ 52 }}" hint-size="52px,52px"></x-import><span style="position:absolute;right:-2px;bottom:-2px;width:18px;height:18px;border-radius:50%;background:var(--gl-blue);color:#fff;display:grid;place-items:center;border:2px solid var(--gl-card)"><x-import component-from-global-scope="GLIcon" n="check" s="10" hint-size="10px,10px"></x-import></span></span><div style="line-height:1.35"><b>{{ askCardName }}</b><div style="font-size:12px;color:var(--gl-muted)">{{ askCardSub }}</div></div></div>
+        <div style="display:flex;gap:12px;align-items:center"><span style="position:relative"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ askCardName }}" sc-camel-src="{{ askCardPhoto }}" size="{{ 52 }}" hint-size="52px,52px"></x-import><span style="position:absolute;right:-2px;bottom:-2px;width:18px;height:18px;border-radius:50%;background:var(--gl-blue);color:#fff;display:grid;place-items:center;border:2px solid var(--gl-card)"><x-import component-from-global-scope="GLIcon" n="check" s="10" hint-size="10px,10px"></x-import></span></span><div style="line-height:1.35"><b>{{ askCardName }}</b><div style="font-size:12px;color:var(--gl-muted)">{{ askCardSub }}</div></div></div>
         <x-import component-from-global-scope="GlobalLinkUI.Button" variant="soft" size="sm" sc-camel-on-click="{{ askCardGo }}" sc-camel-full-width="{{ true }}" hint-size="180px,38px">{{ askCardBtn }}</x-import>
       </div>
 <sc-if value="{{ hasEvents }}">      <div style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);display:grid;gap:10px">
@@ -2177,12 +2232,13 @@ input,textarea{font-family:inherit}
   </sc-if>
 
   <sc-if value="{{ comIsEvents }}">
+    <sc-if value="{{ canHostEvent }}"><div style="display:flex;justify-content:flex-end;margin-bottom:12px"><x-import component-from-global-scope="GlobalLinkUI.Button" variant="primary" size="sm" sc-camel-on-click="{{ openEventForm }}" hint-size="150px,38px">Host an event</x-import></div></sc-if>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:14px">
       <sc-if value="{{ noEvents }}"><div style="padding:22px;text-align:center;color:var(--gl-muted);border:1px dashed var(--gl-line);border-radius:18px;font-size:13.5px;line-height:1.5">No events yet. Global Link posts live Q&amp;As, clubs and workshops here.</div></sc-if><sc-for list="{{ events }}" as="ev" hint-placeholder-count="3">
         <div style="padding:16px;border-radius:18px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-card);padding:18px;display:grid;gap:14px;animation:gl-rise .45s var(--gl-ease-out)">
           <div style="display:flex;gap:14px;align-items:flex-start"><div style="width:58px;flex:none;border-radius:14px;overflow:hidden;text-align:center;border:1px solid var(--gl-line)"><div style="background:var(--gl-grad-primary);color:#fff;font-size:11px;font-weight:800;padding:3px 0">{{ ev.m }}</div><div style="font-size:24px;font-weight:800;padding:3px 0">{{ ev.d }}</div></div><div style="display:grid;gap:4px;min-width:0"><x-import component-from-global-scope="GlobalLinkUI.Badge" tone="tint" hint-size="70px,20px">{{ ev.kind }}</x-import><b style="font-size:15.5px;line-height:1.3">{{ ev.title }}</b><span style="font-size:12.5px;color:var(--gl-muted)">Hosted by {{ ev.hostName }}</span></div></div>
           <div style="display:grid;gap:2px;padding:10px 12px;border-radius:12px;background:var(--gl-soft)"><b style="font-family:var(--gl-font-mono);font-size:13px">{{ ev.mine }}</b><span style="font-family:var(--gl-font-mono);font-size:12px;color:var(--gl-faint)">{{ ev.other }}</span></div>
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--gl-muted)"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ ev.hostName }}" src="{{ ev.hostPhoto }}" size="{{ 26 }}" hint-size="26px,26px"></x-import>{{ ev.goingLabel }}</span><button sc-camel-on-click="{{ ev.rsvpGo }}" style="height:36px;padding:0 14px;border-radius:10px;border:0;background:{{ ev.rsvpBg }};color:{{ ev.rsvpFg }};font-weight:800;font-size:12.5px;cursor:pointer;transition:all .3s var(--gl-ease-spring)" style-active="transform:scale(.95)">{{ ev.rsvpLabel }}</button></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--gl-muted)"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ ev.hostName }}" sc-camel-src="{{ ev.hostPhoto }}" size="{{ 26 }}" hint-size="26px,26px"></x-import>{{ ev.goingLabel }}</span><button sc-camel-on-click="{{ ev.rsvpGo }}" style="height:36px;padding:0 14px;border-radius:10px;border:0;background:{{ ev.rsvpBg }};color:{{ ev.rsvpFg }};font-weight:800;font-size:12.5px;cursor:pointer;transition:all .3s var(--gl-ease-spring)" style-active="transform:scale(.95)">{{ ev.rsvpLabel }}</button><sc-if value="{{ ev.hasLink }}"><a href="{{ ev.link }}" target="_blank" rel="noopener" style="font-size:12.5px;font-weight:700;margin-left:10px">Join link</a></sc-if></div>
         </div>
       </sc-for>
     </div>
@@ -2208,7 +2264,7 @@ input,textarea{font-family:inherit}
   <div style="display:flex;align-items:center;gap:10px"><span style="width:10px;height:10px;border-radius:50%;background:var(--gl-blue);animation:glSpot 1.8s infinite"></span><b style="font-size:16px">New student requests</b><span style="font-size:12.5px;color:var(--gl-muted)">from globallink.com</span></div>
   <sc-for list="{{ tReqPending }}" as="r" hint-placeholder-count="1">
     <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px;border-radius:14px;background:var(--gl-soft)">
-      <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ r.name }}" src="{{ r.photo }}" size="{{ 44 }}" hint-size="44px,44px"></x-import>
+      <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ r.name }}" sc-camel-src="{{ r.photo }}" size="{{ 44 }}" hint-size="44px,44px"></x-import>
       <div style="flex:1;min-width:200px;line-height:1.35"><b>{{ r.name }}</b> <span style="font-size:12.5px;color:var(--gl-muted)">{{ r.sub }}</span><div style="font-size:12.5px;color:var(--gl-muted)">Wants: {{ r.subj }} · Goal: “{{ r.goal }}”</div></div>
       <x-import component-from-global-scope="GlobalLinkUI.Button" variant="ghost" size="sm" sc-camel-on-click="{{ r.decline }}" hint-size="90px,38px">Decline</x-import><x-import component-from-global-scope="GlobalLinkUI.Button" variant="primary" size="sm" sc-camel-on-click="{{ r.accept }}" hint-size="90px,38px">Accept</x-import>
     </div>
@@ -2225,7 +2281,7 @@ input,textarea{font-family:inherit}
   <div style="display:grid;gap:6px;padding:8px;border-radius:20px;background:var(--gl-hero);border:1px solid var(--gl-line);max-width:340px">
     <sc-for list="{{ studs }}" as="st" hint-placeholder-count="4">
       <button sc-camel-on-click="{{ st.pick }}" style="display:flex;gap:12px;align-items:center;padding:10px;border:0;border-radius:14px;background:{{ st.bg }};color:var(--gl-ink);cursor:pointer;text-align:left;transition:background .2s" style-hover="background:var(--gl-tint)">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ st.name }}" src="{{ st.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ st.name }}" sc-camel-src="{{ st.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
         <span style="flex:1;min-width:0;line-height:1.3"><b style="font-size:13.5px">{{ st.name }}</b><span style="display:block;font-size:12px;color:var(--gl-muted)">{{ st.grade }} · {{ st.city }}</span></span>
         <span style="font-size:11px;color:var(--gl-faint);white-space:nowrap">{{ st.next }}</span>
       </button>
@@ -2234,7 +2290,7 @@ input,textarea{font-family:inherit}
   <div style="grid-column:span 2;min-width:0;display:grid;gap:16px">
     <x-import component-from-global-scope="GlobalLinkUI.Card" padding="md" hint-size="100%,220px">
       <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ stu.name }}" src="{{ stu.photo }}" size="{{ 72 }}" hint-size="72px,72px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ stu.name }}" sc-camel-src="{{ stu.photo }}" size="{{ 72 }}" hint-size="72px,72px"></x-import>
         <div style="flex:1;min-width:220px;display:grid;gap:8px">
           <div><b style="font-size:21px;letter-spacing:-.02em">{{ stu.name }}</b> <span style="font-family:var(--gl-font-zh);color:var(--gl-muted)">{{ stu.zh }}</span></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -2283,7 +2339,7 @@ input,textarea{font-family:inherit}
       <button sc-camel-on-click="{{ q.pick }}" style="display:flex;gap:12px;align-items:center;padding:14px;border-radius:16px;border:1.5px solid {{ q.bd }};background:{{ q.bg }};color:var(--gl-ink);cursor:pointer;text-align:left;transition:all .25s" style-hover="transform:translateY(-2px);box-shadow:var(--gl-shadow-hover)">
         <span style="position:relative;width:46px;height:46px;flex:none">
           <svg width="46" height="46" sc-camel-view-box="0 0 40 40" style="transform:rotate(-90deg);position:absolute;inset:0"><circle cx="20" cy="20" r="16" fill="none" style="stroke:var(--gl-line);stroke-width:3"></circle><circle cx="20" cy="20" r="16" fill="none" style="stroke:{{ q.ring }};stroke-width:3;stroke-linecap:round;stroke-dasharray:{{ q.dash }}"></circle></svg>
-          <span style="position:absolute;inset:7px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.name }}" src="{{ q.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import></span>
+          <span style="position:absolute;inset:7px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ q.name }}" sc-camel-src="{{ q.photo }}" size="{{ 32 }}" hint-size="32px,32px"></x-import></span>
         </span>
         <span style="flex:1;min-width:0;line-height:1.35"><b style="display:block;font-size:13.5px;text-wrap:pretty">{{ q.q }}</b><span style="font-size:12px;color:var(--gl-muted)">{{ q.first }} · {{ q.type }} · <span style="color:{{ q.ring }};font-weight:700">{{ q.left }}</span></span></span>
       </button>
@@ -2294,14 +2350,14 @@ input,textarea{font-family:inherit}
     <sc-if value="{{ hasRq }}">
       <x-import component-from-global-scope="GlobalLinkUI.Card" padding="md" hint-size="100%,460px">
         <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
-          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ rq.name }}" src="{{ rq.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
+          <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ rq.name }}" sc-camel-src="{{ rq.photo }}" size="{{ 40 }}" hint-size="40px,40px"></x-import>
           <div style="flex:1"><b>{{ rq.name }}</b><div style="font-size:12px;color:var(--gl-muted)">{{ rq.asked }} · asked for a {{ rq.type }}</div></div>
           <x-import component-from-global-scope="GlobalLinkUI.Badge" tone="{{ rqTone }}" hint-size="80px,22px">{{ rq.left }}</x-import>
         </div>
         <div style="font-size:19px;font-weight:800;letter-spacing:-.015em;line-height:1.35;margin-bottom:18px;text-wrap:pretty">"{{ rq.q }}"</div>
         <sc-if value="{{ rqVideo }}">
           <div style="display:grid;gap:12px">
-            <div style="position:relative;aspect-ratio:16/9;max-height:300px;border-radius:18px;overflow:hidden;background:url(assets/emma.png) center 25%/cover #0c1730">
+            <div style="position:relative;aspect-ratio:16/9;max-height:300px;border-radius:18px;overflow:hidden;background:{{ T.recBg }}"><sc-if value="{{ LIVE }}"><video id="gl-rec-video" muted playsinline autoplay style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video></sc-if>
               <div style="position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(12,23,48,.7))"></div>
               <sc-if value="{{ recOn }}"><div style="position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;background:rgba(229,72,77,.92);color:#fff;font-size:12px;font-weight:800"><span style="width:8px;height:8px;border-radius:50%;background:#fff;animation:glRec 1s infinite"></span>REC {{ recTime }}</div></sc-if>
               <sc-if value="{{ recDone }}"><div style="position:absolute;inset:0;display:grid;place-items:center"><span style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.92);color:var(--gl-blue);display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="play" s="22" hint-size="22px,22px"></x-import></span></div></sc-if>
@@ -2438,7 +2494,7 @@ input,textarea{font-family:inherit}
   <div sc-camel-on-click="{{ closeSess }}" style="position:absolute;inset:0;z-index:60;background:rgba(12,23,48,.5);backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:glScrim .2s">
     <div sc-camel-on-click="{{ stop }}" style="width:min(480px,100%);border-radius:26px;background:var(--gl-card);box-shadow:var(--gl-shadow-pop);overflow:hidden;animation:glModal .3s var(--gl-ease-out)">
       <div style="padding:22px;background:var(--gl-hero);border-bottom:1px solid var(--gl-line);display:flex;gap:14px;align-items:center">
-        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ sf.person }}" src="{{ sf.photo }}" size="{{ 52 }}" hint-size="52px,52px"></x-import>
+        <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ sf.person }}" sc-camel-src="{{ sf.photo }}" size="{{ 52 }}" hint-size="52px,52px"></x-import>
         <div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:700;color:var(--gl-blue)">{{ sf.cls }} · {{ sf.person }}</div><b style="font-size:19px;letter-spacing:-.02em;line-height:1.25;display:block">{{ sf.topic }}</b></div>
         <button sc-camel-on-click="{{ closeSess }}" title="Close" style="width:32px;height:32px;border:0;border-radius:9px;background:transparent;color:var(--gl-muted);cursor:pointer;display:grid;place-items:center;align-self:flex-start" style-hover="background:var(--gl-tint)"><x-import component-from-global-scope="GLIcon" n="x" s="17" hint-size="17px,17px"></x-import></button>
       </div>
@@ -2473,7 +2529,7 @@ input,textarea{font-family:inherit}
       <div style="display:grid;gap:8px">
         <sc-for list="{{ bookSlots }}" as="b" hint-placeholder-count="4">
           <button sc-camel-on-click="{{ b.pick }}" style="display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;border:1.5px solid {{ b.bd }};background:{{ b.bg }};color:var(--gl-ink);cursor:pointer;text-align:left;transition:all .2s">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ b.mentor }}" src="{{ b.photo }}" size="{{ 38 }}" hint-size="38px,38px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ b.mentor }}" sc-camel-src="{{ b.photo }}" size="{{ 38 }}" hint-size="38px,38px"></x-import>
             <span style="flex:1;line-height:1.3"><b style="font-size:13.5px;display:block">{{ b.when }}</b><span style="font-size:12px;color:var(--gl-muted)">{{ b.mentor }} · {{ b.other }}</span></span>
             <sc-if value="{{ b.sel }}"><span style="width:24px;height:24px;border-radius:50%;background:var(--gl-blue);color:#fff;display:grid;place-items:center;animation:glCheck .35s var(--gl-ease-spring)"><x-import component-from-global-scope="GLIcon" n="check" s="14" hint-size="14px,14px"></x-import></span></sc-if>
           </button>
@@ -2495,7 +2551,7 @@ input,textarea{font-family:inherit}
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
         <sc-for list="{{ askMentors }}" as="m" hint-placeholder-count="3">
           <button sc-camel-on-click="{{ m.pick }}" style="display:grid;justify-items:center;gap:6px;padding:12px 8px;border-radius:16px;border:1.5px solid {{ m.bd }};background:{{ m.bg }};color:var(--gl-ink);cursor:pointer;transition:all .2s var(--gl-ease-spring)" style-hover="transform:translateY(-2px)">
-            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ m.name }}" src="{{ m.photo }}" size="{{ 46 }}" hint-size="46px,46px"></x-import>
+            <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ m.name }}" sc-camel-src="{{ m.photo }}" size="{{ 46 }}" hint-size="46px,46px"></x-import>
             <b style="font-size:13px">{{ m.first }}</b><span style="font-size:11.5px;color:var(--gl-muted);margin-top:-6px;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis">{{ m.subj }}</span>
           </button>
         </sc-for>
@@ -2518,12 +2574,72 @@ input,textarea{font-family:inherit}
 </sc-if>
 
 <!-- MATERIAL PREVIEW -->
+<sc-if value="{{ buyOpen }}">
+<div sc-camel-on-click="{{ closeBuy }}" style="position:absolute;inset:0;z-index:62;background:rgba(12,23,48,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:glScrim .2s">
+  <div sc-camel-on-click="{{ stop }}" role="dialog" aria-label="Buy lessons" style="width:min(560px,100%);max-height:calc(100% - 24px);overflow:auto;border-radius:26px;background:var(--gl-card);box-shadow:var(--gl-shadow-pop);animation:glModal .3s var(--gl-ease-out)">
+    <div style="padding:22px 22px 0;display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+      <div><div style="font-family:var(--gl-font-zh);font-size:12.5px;font-weight:700;color:var(--gl-blue)">购买课时</div><b style="font-size:20px;letter-spacing:-.02em">Buy lessons</b><div style="font-size:13px;color:var(--gl-muted);margin-top:2px">You have {{ buy.credits }} lesson credit(s). One credit is one 40-minute lesson.</div></div>
+      <button sc-camel-on-click="{{ closeBuy }}" title="Close" style="width:34px;height:34px;flex:none;border:0;border-radius:10px;background:var(--gl-soft);color:var(--gl-muted);cursor:pointer;display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="x" s="16" hint-size="16px,16px"></x-import></button>
+    </div>
+    <div style="padding:16px 22px;display:grid;gap:8px">
+      <sc-for list="{{ buy.packs }}" as="pk" hint-placeholder-count="0">
+        <button sc-camel-on-click="{{ pk.pick }}" style="display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;border:1.5px solid {{ pk.bd }};background:{{ pk.bg }};color:var(--gl-ink);cursor:pointer;text-align:left;transition:border-color .2s,background .2s">
+          <span style="width:18px;height:18px;flex:none;border-radius:50%;border:2px solid {{ pk.bd }};display:grid;place-items:center"><span style="width:8px;height:8px;border-radius:50%;background:{{ pk.dot }}"></span></span>
+          <span style="flex:1;min-width:0;line-height:1.3"><b style="display:block;font-size:14px">{{ pk.name }}</b><span style="font-size:12px;color:var(--gl-muted)">{{ pk.sub }}</span></span>
+          <b style="font-family:var(--gl-font-mono);font-size:15px">¥{{ pk.price }}</b>
+        </button>
+      </sc-for>
+    </div>
+    <div style="padding:0 22px 22px;display:grid;gap:12px">
+      <div style="padding:14px;border-radius:16px;background:rgba(7,193,96,.08);border:1px solid rgba(7,193,96,.35);display:grid;gap:8px">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="width:28px;height:28px;border-radius:8px;background:#07c160;color:#fff;display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="message-circle" s="15" hint-size="15px,15px"></x-import></span><b style="font-size:15px">Pay on WeChat</b><span style="font-size:10.5px;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:rgba(7,193,96,.16);color:#078a46">HOW MOST FAMILIES PAY</span></div>
+        <div style="font-size:13px;line-height:1.55;color:var(--gl-muted)">{{ buy.wechatText }}</div>
+        <sc-if value="{{ buy.sent }}"><div style="display:flex;gap:8px;align-items:center;font-size:13px;font-weight:700;color:var(--gl-success)"><x-import component-from-global-scope="GLIcon" n="circle-check" s="16" hint-size="16px,16px"></x-import>Request sent. We’ll add your credits as soon as the payment arrives.</div></sc-if>
+        <sc-if value="{{ buy.notSent }}"><div><x-import component-from-global-scope="GlobalLinkUI.Button" variant="primary" size="sm" sc-camel-on-click="{{ buyWechat }}" hint-size="150px,38px">Send payment request</x-import></div></sc-if>
+      </div>
+      <sc-if value="{{ buy.stripe }}"><button sc-camel-on-click="{{ buyStripe }}" style="display:flex;gap:10px;align-items:center;justify-content:center;min-height:46px;border-radius:12px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);font-weight:700;cursor:pointer"><x-import component-from-global-scope="GLIcon" n="credit-card" s="17" hint-size="17px,17px"></x-import>Pay now by card, Alipay or WeChat Pay</button></sc-if>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--gl-faint)"><span>Paying inside the app with</span><span style="padding:3px 9px;border-radius:999px;border:1px dashed var(--gl-line)">WeChat Pay</span><span style="padding:3px 9px;border-radius:999px;border:1px dashed var(--gl-line)">Alipay</span><span>is coming soon.</span></div>
+      <sc-if value="{{ buy.hasHistory }}"><div style="display:grid;gap:6px;padding-top:6px;border-top:1px solid var(--gl-line)"><b style="font-size:13px">Your payments</b><sc-for list="{{ buy.history }}" as="ph" hint-placeholder-count="0"><div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px"><span>{{ ph.name }} · {{ ph.when }}</span><span style="font-weight:700;color:{{ ph.fg }}">¥{{ ph.amount }} · {{ ph.status }}</span></div></sc-for></div></sc-if>
+    </div>
+  </div>
+</div>
+</sc-if>
+<sc-if value="{{ evFormOpen }}">
+<div sc-camel-on-click="{{ closeEventForm }}" style="position:absolute;inset:0;z-index:62;background:rgba(12,23,48,.55);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:glScrim .2s">
+  <div sc-camel-on-click="{{ stop }}" role="dialog" aria-label="Host an event" style="width:min(520px,100%);max-height:calc(100% - 24px);overflow:auto;border-radius:26px;background:var(--gl-card);box-shadow:var(--gl-shadow-pop);animation:glModal .3s var(--gl-ease-out)">
+    <div style="padding:22px 22px 0;display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+      <div><div style="font-family:var(--gl-font-zh);font-size:12.5px;font-weight:700;color:var(--gl-blue)">发布活动</div><b style="font-size:20px;letter-spacing:-.02em">Host an event</b><div style="font-size:13px;color:var(--gl-muted);margin-top:2px">Shows in Community → Events for every student and mentor.</div></div>
+      <button sc-camel-on-click="{{ closeEventForm }}" title="Close" style="width:34px;height:34px;flex:none;border:0;border-radius:10px;background:var(--gl-soft);color:var(--gl-muted);cursor:pointer;display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="x" s="16" hint-size="16px,16px"></x-import></button>
+    </div>
+    <div style="padding:16px 22px 22px;display:grid;gap:12px">
+      <x-import component-from-global-scope="GlobalLinkUI.TextField" label="Title" value="{{ evf.title }}" sc-camel-on-change="{{ evf.setTitle }}" placeholder="Halloween in America: live Q&amp;A" hint-size="100%,72px"></x-import>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ evf.kinds }}" as="ek" hint-placeholder-count="0"><x-import component-from-global-scope="GlobalLinkUI.Chip" variant="{{ ek.variant }}" sc-camel-on-click="{{ ek.pick }}" hint-size="90px,32px">{{ ek.l }}</x-import></sc-for></div>
+      <label style="display:grid;gap:6px;font-weight:700;font-size:14px">Starts (your time)<input type="datetime-local" value="{{ evf.when }}" sc-camel-on-change="{{ evf.setWhen }}" style="min-height:46px;padding:8px 12px;border:1px solid var(--gl-line);border-radius:10px;background:var(--gl-card);color:var(--gl-ink);font:500 15px var(--gl-font-ui)"></label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ evf.durs }}" as="ed" hint-placeholder-count="0"><x-import component-from-global-scope="GlobalLinkUI.Chip" variant="{{ ed.variant }}" sc-camel-on-click="{{ ed.pick }}" hint-size="90px,32px">{{ ed.l }}</x-import></sc-for></div>
+      <x-import component-from-global-scope="GlobalLinkUI.TextField" label="Meeting link (optional)" value="{{ evf.link }}" sc-camel-on-change="{{ evf.setLink }}" placeholder="https://…" hint-size="100%,72px"></x-import>
+      <x-import component-from-global-scope="GlobalLinkUI.TextField" label="About" multiline="{{ true }}" value="{{ evf.body }}" sc-camel-on-change="{{ evf.setBody }}" placeholder="What will you talk about?" hint-size="100%,120px"></x-import>
+      <div style="display:flex;justify-content:flex-end"><x-import component-from-global-scope="GlobalLinkUI.Button" variant="primary" size="md" sc-camel-on-click="{{ evf.post }}" hint-size="150px,38px">Post event</x-import></div>
+    </div>
+  </div>
+</div>
+</sc-if>
 <sc-if value="{{ matOpen }}">
   <div sc-camel-on-click="{{ closeMat }}" style="position:absolute;inset:0;z-index:60;background:rgba(12,23,48,.5);backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:glScrim .2s">
-    <div sc-camel-on-click="{{ stop }}" style="width:min(460px,100%);border-radius:26px;background:var(--gl-card);box-shadow:var(--gl-shadow-pop);overflow:hidden;animation:glModal .3s var(--gl-ease-out)">
+    <div sc-camel-on-click="{{ stop }}" style="width:min({{ T.matW }},100%);max-height:calc(100% - 24px);overflow:auto;border-radius:26px;background:var(--gl-card);box-shadow:var(--gl-shadow-pop);animation:glModal .3s var(--gl-ease-out)">
       <div style="height:170px;background:var(--gl-hero);display:grid;place-items:center;border-bottom:1px solid var(--gl-line)"><span style="width:84px;height:84px;border-radius:24px;background:var(--gl-grad-primary);color:#fff;display:grid;place-items:center;box-shadow:var(--gl-shadow-cta);animation:gl-pop .45s var(--gl-ease-spring)"><x-import component-from-global-scope="GLIcon" n="{{ matSel.icon }}" s="38" hint-size="38px,38px"></x-import></span></div>
       <div style="padding:22px;display:grid;gap:14px">
         <div><x-import component-from-global-scope="GlobalLinkUI.Badge" hint-size="70px,22px">{{ matSel.kind }}</x-import><b style="display:block;font-size:19px;letter-spacing:-.02em;margin-top:8px">{{ matSel.title }}</b><div style="font-size:13px;color:var(--gl-muted)">{{ matSel.cls }} · shared by {{ matSel.fromName }} on {{ matSel.date }} · {{ matSel.size }}</div></div>
+        <sc-if value="{{ mv.has }}"><div style="display:grid;gap:12px;padding:14px;border-radius:16px;background:var(--gl-soft);border:1px solid var(--gl-line)">
+          <sc-for list="{{ mv.blocks }}" as="bl" hint-placeholder-count="0">
+            <sc-if value="{{ bl.isH }}"><b style="font-size:16px;letter-spacing:-.01em">{{ bl.text }}</b></sc-if>
+            <sc-if value="{{ bl.isT }}"><p style="margin:0;line-height:1.55;font-size:14px">{{ bl.text }}</p></sc-if>
+            <sc-if value="{{ bl.isQ }}"><div style="display:grid;gap:6px"><b style="font-size:14px">{{ bl.text }}</b><sc-for list="{{ bl.opts }}" as="op" hint-placeholder-count="0"><button sc-camel-on-click="{{ op.pick }}" style="text-align:left;padding:9px 12px;border-radius:10px;border:1.5px solid {{ op.bd }};background:{{ op.bg }};color:var(--gl-ink);font-weight:600;font-size:13.5px;cursor:pointer">{{ op.letter }}. {{ op.t }}</button></sc-for><sc-if value="{{ bl.answered }}"><span style="font-size:12.5px;font-weight:700;color:{{ bl.resFg }}">{{ bl.res }}</span></sc-if></div></sc-if>
+            <sc-if value="{{ bl.isV }}"><button sc-camel-on-click="{{ bl.say }}" style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);cursor:pointer;text-align:left"><x-import component-from-global-scope="GLIcon" n="volume-2" s="16" c="var(--gl-blue)" hint-size="16px,16px"></x-import><span style="line-height:1.35"><b>{{ bl.text }}</b> <span style="font-family:var(--gl-font-zh);color:var(--gl-muted)">{{ bl.zh }}</span><span style="display:block;font-size:12.5px;color:var(--gl-muted)">{{ bl.ex }}</span></span></button></sc-if>
+            <sc-if value="{{ bl.isP }}"><div style="display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--gl-sticky);color:var(--gl-sticky-ink)"><x-import component-from-global-scope="GLIcon" n="mic" s="16" hint-size="16px,16px"></x-import><span style="flex:1;font-weight:600">{{ bl.text }}</span><span style="font-family:var(--gl-font-mono);font-size:12px">{{ bl.secL }}</span></div></sc-if>
+            <sc-if value="{{ bl.isM }}"><div style="display:grid;gap:6px"><span style="font-size:13px;color:var(--gl-muted)">{{ bl.text }}</span><sc-if value="{{ bl.isImage }}"><img sc-camel-src="{{ bl.url }}" alt="" style="max-width:100%;border-radius:12px"></sc-if><sc-if value="{{ bl.isAudio }}"><audio sc-camel-src="{{ bl.url }}" controls preload="none" style="width:100%"></audio></sc-if><sc-if value="{{ bl.isVideo }}"><video sc-camel-src="{{ bl.url }}" controls preload="metadata" playsinline style="width:100%;border-radius:12px"></video></sc-if><sc-if value="{{ bl.isDoc }}"><a href="{{ bl.url }}" target="_blank" rel="noopener" style="font-weight:700">Open {{ bl.name }}</a></sc-if></div></sc-if>
+          </sc-for>
+          <div style="font-size:12px;font-weight:700;color:var(--gl-faint)">{{ mv.progressLabel }}</div>
+        </div></sc-if>
         <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
           <x-import component-from-global-scope="GlobalLinkUI.Button" variant="ghost" size="md" sc-camel-on-click="{{ matDownload }}" hint-size="120px,46px">Download</x-import>
           <sc-if value="{{ matSel.isRec }}"><x-import component-from-global-scope="GlobalLinkUI.Button" variant="primary" size="md" sc-camel-on-click="{{ matToRecap }}" hint-size="140px,46px">Open recap</x-import></sc-if>
@@ -2538,7 +2654,7 @@ input,textarea{font-family:inherit}
 <sc-if value="{{ videoOpen }}">
   <div sc-camel-on-click="{{ closeVideo }}" style="position:absolute;inset:0;z-index:60;background:rgba(12,23,48,.7);backdrop-filter:blur(8px);display:grid;place-items:center;padding:20px;animation:glScrim .2s">
     <div sc-camel-on-click="{{ stop }}" style="width:min(640px,100%);border-radius:24px;overflow:hidden;background:#0c1730;color:#fff;box-shadow:var(--gl-shadow-pop);animation:glModal .3s var(--gl-ease-out)">
-      <div style="position:relative;aspect-ratio:16/9;background:url({{ vf.photo }}) center 22%/cover">
+      <div style="position:relative;aspect-ratio:16/9;background:url({{ vf.photo }}) center 22%/cover"><sc-if value="{{ vf.video }}"><video sc-camel-src="{{ vf.video }}" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:1"></video></sc-if>
         <div style="position:absolute;inset:0;background:linear-gradient(transparent 50%,rgba(12,23,48,.85))"></div>
         <div style="position:absolute;left:16px;right:16px;bottom:16px;display:grid;gap:10px">
           <div style="font-size:15px;line-height:1.45;text-wrap:pretty;max-width:520px">{{ vf.ans }}</div>
@@ -2555,7 +2671,7 @@ input,textarea{font-family:inherit}
 <sc-if value="{{ meTop }}">
   <div sc-camel-on-click="{{ closeMeTop }}" style="position:absolute;inset:0;z-index:58"></div>
   <div style="position:absolute;top:52px;right:12px;width:290px;z-index:59;padding:8px;border-radius:20px;background:var(--gl-card);border:1px solid var(--gl-line);box-shadow:var(--gl-shadow-pop);animation:gl-dd .22s var(--gl-ease-out);transform-origin:top right;display:grid;gap:2px">
-    <div style="display:flex;gap:12px;align-items:center;padding:10px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" src="{{ me.photo }}" size="{{ 46 }}" hint-size="46px,46px"></x-import><div style="min-width:0;line-height:1.3"><b>{{ me.name }}</b><div style="font-size:12px;color:var(--gl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ emailShown }}</div></div></div>
+    <div style="display:flex;gap:12px;align-items:center;padding:10px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" sc-camel-src="{{ me.photo }}" size="{{ 46 }}" hint-size="46px,46px"></x-import><div style="min-width:0;line-height:1.3"><b>{{ me.name }}</b><div style="font-size:12px;color:var(--gl-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ emailShown }}</div></div></div>
     <div style="display:grid;gap:8px;padding:10px;border-radius:14px;background:var(--gl-soft);margin:0 2px 6px">
       <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12.5px;font-weight:700">Theme</span><div style="display:flex;gap:2px;padding:2px;border-radius:999px;background:var(--gl-card);border:1px solid var(--gl-line)"><sc-for list="{{ themeMini }}" as="tm" hint-placeholder-count="3"><button sc-camel-on-click="{{ tm.pick }}" title="{{ tm.label }}" style="width:30px;height:26px;border:0;border-radius:999px;background:{{ tm.bg }};color:{{ tm.fg }};cursor:pointer;display:grid;place-items:center;transition:all .25s"><x-import component-from-global-scope="GLIcon" n="{{ tm.icon }}" s="14" hint-size="14px,14px"></x-import></button></sc-for></div></div>
       <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12.5px;font-weight:700;white-space:nowrap">Text size</span><div style="display:flex;gap:4px;align-items:center"><button sc-camel-on-click="{{ zoomOut }}" title="Smaller" style="width:28px;height:26px;border-radius:8px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);cursor:pointer;display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="minus" s="13" hint-size="13px,13px"></x-import></button><button sc-camel-on-click="{{ zoomReset }}" title="Reset" style="width:52px;height:26px;border:0;background:transparent;font-family:var(--gl-font-mono);font-size:12px;font-weight:700;color:var(--gl-ink);cursor:pointer">{{ zoomLabel }}</button><button sc-camel-on-click="{{ zoomIn }}" title="Bigger" style="width:28px;height:26px;border-radius:8px;border:1px solid var(--gl-line);background:var(--gl-card);color:var(--gl-ink);cursor:pointer;display:grid;place-items:center"><x-import component-from-global-scope="GLIcon" n="plus" s="13" hint-size="13px,13px"></x-import></button></div></div>
@@ -2640,7 +2756,7 @@ input,textarea{font-family:inherit}
 
 <!-- CREATE POST -->
 <sc-if value="{{ postOpen }}">
-<div sc-camel-on-click="{{ closePost }}" style="position:absolute;inset:0;z-index:62;background:rgba(12,23,48,.5);backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:glScrim .2s"><div sc-camel-on-click="{{ stop }}" style="width:min(560px,100%);max-height:100%;overflow:auto;border-radius:26px;background:var(--gl-card);box-shadow:var(--gl-shadow-pop);padding:24px;display:grid;gap:16px;animation:glModal .3s var(--gl-ease-out)"><div style="display:flex;gap:12px;align-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" src="{{ me.photo }}" size="{{ 42 }}" hint-size="42px,42px"></x-import><div><b style="font-size:19px;letter-spacing:-.02em">Create a post</b><div style="font-size:12.5px;color:var(--gl-muted)">Visible to students and mentors in the group you pick.</div></div></div>
+<div sc-camel-on-click="{{ closePost }}" style="position:absolute;inset:0;z-index:62;background:rgba(12,23,48,.5);backdrop-filter:blur(6px);display:grid;place-items:center;padding:20px;animation:glScrim .2s"><div sc-camel-on-click="{{ stop }}" style="width:min(560px,100%);max-height:100%;overflow:auto;border-radius:26px;background:var(--gl-card);box-shadow:var(--gl-shadow-pop);padding:24px;display:grid;gap:16px;animation:glModal .3s var(--gl-ease-out)"><div style="display:flex;gap:12px;align-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ me.name }}" sc-camel-src="{{ me.photo }}" size="{{ 42 }}" hint-size="42px,42px"></x-import><div><b style="font-size:19px;letter-spacing:-.02em">Create a post</b><div style="font-size:12.5px;color:var(--gl-muted)">Visible to students and mentors in the group you pick.</div></div></div>
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><b style="font-size:14px">Type</b><x-import component-from-global-scope="GlobalLinkUI.SegmentedControl" value="{{ pType }}" sc-camel-on-change="{{ setPType }}" options="{{ pTypeOpts }}" hint-size="290px,40px"></x-import></div>
   <div style="display:grid;gap:8px"><b style="font-size:14px">Group</b><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ pGroupOpts }}" as="pg" hint-placeholder-count="4"><x-import component-from-global-scope="GlobalLinkUI.Chip" variant="{{ pg.variant }}" sc-camel-on-click="{{ pg.pick }}" hint-size="120px,32px">{{ pg.label }}</x-import></sc-for></div></div>
   <x-import component-from-global-scope="GlobalLinkUI.TextField" label="Title" value="{{ pTitle }}" sc-camel-on-change="{{ setPTitle }}" placeholder="{{ pTitlePh }}" hint-size="100%,72px"></x-import>
@@ -2653,7 +2769,7 @@ input,textarea{font-family:inherit}
   <div sc-camel-on-click="{{ aCloseUser }}" style="position:absolute;top:46px;left:0;right:0;bottom:0;z-index:50;background:rgba(12,23,48,.35);animation:glScrim .2s"></div>
   <div data-screen-label="Admin user detail" style="position:absolute;top:46px;right:0;bottom:0;width:min(420px,100%);z-index:51;display:flex;flex-direction:column;background:var(--gl-card);border-left:1px solid var(--gl-line);box-shadow:-20px 0 50px rgba(20,48,94,.18);animation:glSlide .35s var(--gl-ease-out)">
     <div style="padding:18px;border-bottom:1px solid var(--gl-line);background:var(--gl-hero);display:flex;gap:14px;align-items:center">
-      <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ aU.name }}" src="{{ aU.photo }}" size="{{ 56 }}" hint-size="56px,56px"></x-import>
+      <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ aU.name }}" sc-camel-src="{{ aU.photo }}" size="{{ 56 }}" hint-size="56px,56px"></x-import>
       <div style="flex:1;min-width:0;line-height:1.3"><b style="font-size:18px;letter-spacing:-.01em">{{ aU.name }}</b><div style="font-size:12.5px;color:var(--gl-muted)">{{ aU.role }} · {{ aU.loc }} · joined {{ aU.joined }}</div><div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;margin-top:3px"><span style="width:8px;height:8px;border-radius:50%;background:{{ aU.dot }}"></span>{{ aU.status }} · {{ aU.last }}</div></div>
       <button sc-camel-on-click="{{ aCloseUser }}" title="Close" style="width:32px;height:32px;border:0;border-radius:9px;background:transparent;color:var(--gl-muted);cursor:pointer;display:grid;place-items:center;align-self:flex-start" style-hover="background:var(--gl-tint)"><x-import component-from-global-scope="GLIcon" n="x" s="17" hint-size="17px,17px"></x-import></button>
     </div>
@@ -2763,7 +2879,7 @@ input,textarea{font-family:inherit}
           <b style="font-size:14px">Students</b>
           <sc-for list="{{ asgStudents }}" as="st" hint-placeholder-count="4">
             <button sc-camel-on-click="{{ st.pick }}" disabled="{{ st.blocked }}" style="display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:14px;border:1.5px solid {{ st.bd }};background:{{ st.bg }};color:var(--gl-ink);cursor:{{ st.cur }};text-align:left;opacity:{{ st.op }};transition:all .2s">
-              <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ st.name }}" src="{{ st.photo }}" size="{{ 34 }}" hint-size="34px,34px"></x-import>
+              <x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ st.name }}" sc-camel-src="{{ st.photo }}" size="{{ 34 }}" hint-size="34px,34px"></x-import>
               <span style="flex:1;min-width:0;line-height:1.3"><b style="font-size:13.5px;display:block">{{ st.name }}</b><span style="font-size:12px;color:{{ st.subFg }}">{{ st.sub }}</span></span>
               <sc-if value="{{ st.blocked }}"><span style="display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:var(--gl-muted);white-space:nowrap"><x-import component-from-global-scope="GLIcon" n="lock" s="12" hint-size="12px,12px"></x-import>Not in plan</span></sc-if>
               <sc-if value="{{ st.ok }}"><span style="width:22px;height:22px;border-radius:7px;border:2px solid {{ st.cbBd }};background:{{ st.cbBg }};color:#fff;display:grid;place-items:center"><sc-if value="{{ st.sel }}"><span style="display:grid;animation:glCheck .35s var(--gl-ease-spring)"><x-import component-from-global-scope="GLIcon" n="check" s="13" hint-size="13px,13px"></x-import></span></sc-if></span></sc-if>
@@ -2846,7 +2962,7 @@ input,textarea{font-family:inherit}
           <sc-if value="{{ ntShared }}">
             <div style="display:grid;gap:12px;padding:14px;border-radius:16px;background:var(--gl-soft);animation:gl-rise .3s var(--gl-ease-out)">
               <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <sc-for list="{{ ntMentors }}" as="m" hint-placeholder-count="3"><button sc-camel-on-click="{{ m.pick }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 12px 0 4px;border-radius:999px;border:1.5px solid {{ m.bd }};background:{{ m.bg }};color:var(--gl-ink);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s var(--gl-ease-spring)" style-hover="transform:translateY(-1px)"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ m.name }}" src="{{ m.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>{{ m.first }}<sc-if value="{{ m.sel }}"><span style="width:18px;height:18px;border-radius:50%;background:var(--gl-blue);color:#fff;display:grid;place-items:center;animation:glCheck .35s var(--gl-ease-spring)"><x-import component-from-global-scope="GLIcon" n="check" s="11" hint-size="11px,11px"></x-import></span></sc-if></button></sc-for>
+                <sc-for list="{{ ntMentors }}" as="m" hint-placeholder-count="3"><button sc-camel-on-click="{{ m.pick }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 12px 0 4px;border-radius:999px;border:1.5px solid {{ m.bd }};background:{{ m.bg }};color:var(--gl-ink);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s var(--gl-ease-spring)" style-hover="transform:translateY(-1px)"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ m.name }}" sc-camel-src="{{ m.photo }}" size="{{ 30 }}" hint-size="30px,30px"></x-import>{{ m.first }}<sc-if value="{{ m.sel }}"><span style="width:18px;height:18px;border-radius:50%;background:var(--gl-blue);color:#fff;display:grid;place-items:center;animation:glCheck .35s var(--gl-ease-spring)"><x-import component-from-global-scope="GLIcon" n="check" s="11" hint-size="11px,11px"></x-import></span></sc-if></button></sc-for>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
                 <span style="line-height:1.3"><b style="font-size:13px;display:block">Send a message with it</b><span style="font-size:12px;color:var(--gl-muted)">Shows up in Messages with the task attached.</span></span>
@@ -2875,7 +2991,7 @@ input,textarea{font-family:inherit}
         <div style="display:grid;gap:12px">
           <div style="position:relative;aspect-ratio:16/10;border-radius:22px;overflow:hidden;background:#13213f;box-shadow:0 24px 60px rgba(0,0,0,.4)">
             <sc-if value="{{ call.camOn }}"><div style="position:absolute;inset:0;background:url({{ call.selfPhoto }}) center 18%/cover;transform:{{ mirrorT }}"></div></sc-if>
-            <sc-if value="{{ call.camOff }}"><div style="position:absolute;inset:0;display:grid;place-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ call.selfName }}" src="{{ call.none }}" size="{{ 96 }}" hint-size="96px,96px"></x-import></div></sc-if>
+            <sc-if value="{{ call.camOff }}"><div style="position:absolute;inset:0;display:grid;place-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ call.selfName }}" sc-camel-src="{{ call.none }}" size="{{ 96 }}" hint-size="96px,96px"></x-import></div></sc-if>
             <div style="position:absolute;left:14px;bottom:14px;display:flex;gap:4px;align-items:flex-end;height:24px;padding:6px 10px;border-radius:999px;background:rgba(10,20,40,.6)"><span style="width:3px;height:100%;background:#3ddc84;border-radius:2px;transform-origin:bottom;animation:glLevel .8s infinite"></span><span style="width:3px;height:100%;background:#3ddc84;border-radius:2px;transform-origin:bottom;animation:glLevel .6s .1s infinite"></span><span style="width:3px;height:100%;background:#3ddc84;border-radius:2px;transform-origin:bottom;animation:glLevel .9s .2s infinite"></span><span style="width:3px;height:100%;background:#3ddc84;border-radius:2px;transform-origin:bottom;animation:glLevel .7s .3s infinite"></span></div>
             <span style="position:absolute;right:14px;bottom:14px;padding:5px 10px;border-radius:999px;background:rgba(10,20,40,.6);font-size:12px;font-weight:700">You</span>
           </div>
@@ -2885,7 +3001,7 @@ input,textarea{font-family:inherit}
         <div style="display:grid;gap:16px">
           <div style="font-family:var(--gl-font-zh);font-size:13px;font-weight:700;color:#7fb6ff">准备好了吗？</div>
           <h2 style="margin:-10px 0 0;font-size:30px;font-weight:800;letter-spacing:-.025em;line-height:1.15;text-wrap:balance">Telling the story of your Golden Week</h2>
-          <div style="display:flex;align-items:center;gap:10px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ call.mainName }}" src="{{ call.mainPhoto }}" size="{{ 34 }}" hint-size="34px,34px"></x-import><span><b>{{ call.mainName }}</b> {{ preWho }}</span><span style="width:8px;height:8px;border-radius:50%;background:#3ddc84;animation:glPulse 2s infinite"></span></div>
+          <div style="display:flex;align-items:center;gap:10px"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ call.mainName }}" sc-camel-src="{{ call.mainPhoto }}" size="{{ 34 }}" hint-size="34px,34px"></x-import><span><b>{{ call.mainName }}</b> {{ preWho }}</span><span style="width:8px;height:8px;border-radius:50%;background:#3ddc84;animation:glPulse 2s infinite"></span></div>
           <div style="font-size:13px;color:#a9b9d6"><b style="font-family:var(--gl-font-mono);color:#fff">{{ clockA.t }}</b> {{ clockA.city }} · <span style="font-family:var(--gl-font-mono)">{{ clockB.t }}</span> {{ clockB.city }} · 40 min</div>
           <div style="display:grid;gap:6px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:13px;color:#c9dbf7">
             <div style="display:flex;gap:8px;align-items:center"><x-import component-from-global-scope="GLIcon" n="presentation" s="15" c="#7fb6ff" hint-size="15px,15px"></x-import>Golden Week story map · 12 slides</div>
@@ -2907,12 +3023,12 @@ input,textarea{font-family:inherit}
     <div style="flex:1;display:flex;gap:14px;padding:0 18px;min-height:0">
       <div style="position:relative;flex:1;min-width:0;border-radius:22px;overflow:hidden;background:#13213f"><div style="position:absolute;inset:-60px;background:url({{ call.mainPhoto }}) center/cover;filter:blur(46px) brightness(.5) saturate(1.3)"></div><div style="position:absolute;inset:0;display:grid;place-items:center;padding-bottom:40px"><div style="position:relative;display:grid;place-items:center"><span style="position:absolute;width:150px;height:150px;border-radius:50%;border:3px solid rgba(61,220,132,.75);animation:glSpeak 1.8s ease-out infinite"></span><span style="position:absolute;width:150px;height:150px;border-radius:50%;border:3px solid rgba(61,220,132,.5);animation:glSpeak 1.8s .6s ease-out infinite"></span><span role="img" aria-label="{{ call.mainName }}" style="position:relative;width:140px;height:140px;border-radius:50%;background:url({{ call.mainPhoto }}) center/cover;box-shadow:0 0 0 4px rgba(255,255,255,.15),0 20px 50px rgba(0,0,0,.45)"></div></div>
         <sc-if value="{{ call.share }}"><div style="position:absolute;inset:0;background:#0f1d3a;display:grid;place-items:center;padding:30px;animation:glScrim .3s"><div style="width:min(620px,90%);aspect-ratio:16/9;border-radius:16px;background:#fff;color:#14305e;padding:28px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center;box-shadow:0 20px 50px rgba(0,0,0,.4)"><div><div style="font-size:12px;font-weight:800;color:#2f8cf3;letter-spacing:.08em">SLIDE 3 OF 12</div><b style="font-size:26px;line-height:1.15;letter-spacing:-.02em">Where did you go? What did you see?</b></div><div style="height:100%;border-radius:12px;background:url(assets/club.png) center/cover"></div></div></div></sc-if>
-        <div style="position:absolute;left:14px;top:14px;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:999px;background:rgba(10,20,40,.6);backdrop-filter:blur(8px);font-size:13px;font-weight:700"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ call.mainName }}" src="{{ call.mainPhoto }}" size="{{ 24 }}" hint-size="24px,24px"></x-import>{{ call.mainName }}<span style="display:flex;gap:2px;align-items:flex-end;height:12px;margin-left:2px"><span style="width:2px;height:100%;background:#3ddc84;transform-origin:bottom;animation:glLevel .7s infinite"></span><span style="width:2px;height:100%;background:#3ddc84;transform-origin:bottom;animation:glLevel .5s .1s infinite"></span><span style="width:2px;height:100%;background:#3ddc84;transform-origin:bottom;animation:glLevel .8s .2s infinite"></span></span></div>
+        <div style="position:absolute;left:14px;top:14px;display:flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:999px;background:rgba(10,20,40,.6);backdrop-filter:blur(8px);font-size:13px;font-weight:700"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ call.mainName }}" sc-camel-src="{{ call.mainPhoto }}" size="{{ 24 }}" hint-size="24px,24px"></x-import>{{ call.mainName }}<span style="display:flex;gap:2px;align-items:flex-end;height:12px;margin-left:2px"><span style="width:2px;height:100%;background:#3ddc84;transform-origin:bottom;animation:glLevel .7s infinite"></span><span style="width:2px;height:100%;background:#3ddc84;transform-origin:bottom;animation:glLevel .5s .1s infinite"></span><span style="width:2px;height:100%;background:#3ddc84;transform-origin:bottom;animation:glLevel .8s .2s infinite"></span></span></div>
         <sc-if value="{{ call.studentHand }}"><button sc-camel-on-click="{{ lowerHand }}" style="position:absolute;left:14px;top:56px;display:flex;align-items:center;gap:8px;padding:7px 12px;border:0;border-radius:999px;background:#ffd66b;color:#3d3100;font-weight:800;font-size:12.5px;cursor:pointer;animation:gl-pop .4s var(--gl-ease-spring)"><x-import component-from-global-scope="GLIcon" n="hand" s="15" hint-size="15px,15px"></x-import>Mia raised her hand · lower</button></sc-if>
         <sc-if value="{{ call.showCap }}"><div style="position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(620px,calc(100% - 260px));padding:10px 16px;border-radius:14px;background:rgba(10,20,40,.75);backdrop-filter:blur(8px);text-align:center"><div style="font-size:11px;font-weight:800;color:#7fb6ff;letter-spacing:.06em">{{ call.capWho }} · LUMI CAPTIONS</div><div style="font-size:16px;font-weight:600">{{ call.capEn }}</div><sc-if value="{{ capZhOn }}"><div style="font-family:var(--gl-font-zh);font-size:13px;color:#a9b9d6">{{ call.capZh }}</div></sc-if></div></sc-if>
         <div style="position:absolute;right:14px;bottom:14px;width:190px;aspect-ratio:16/10;border-radius:14px;overflow:hidden;border:2px solid rgba(255,255,255,.18);background:#13213f;box-shadow:0 10px 24px rgba(0,0,0,.4)">
           <sc-if value="{{ call.camOn }}"><div style="position:absolute;inset:0;background:url({{ call.selfPhoto }}) center 18%/cover;transform:{{ mirrorT }}"></div></sc-if>
-          <sc-if value="{{ call.camOff }}"><div style="position:absolute;inset:0;display:grid;place-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ call.selfName }}" src="{{ call.none }}" size="{{ 48 }}" hint-size="48px,48px"></x-import></div></sc-if>
+          <sc-if value="{{ call.camOff }}"><div style="position:absolute;inset:0;display:grid;place-items:center"><x-import component-from-global-scope="GlobalLinkUI.Avatar" name="{{ call.selfName }}" sc-camel-src="{{ call.none }}" size="{{ 48 }}" hint-size="48px,48px"></x-import></div></sc-if>
           <span style="position:absolute;left:8px;bottom:6px;display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:700">You<sc-if value="{{ call.micOff }}"><x-import component-from-global-scope="GLIcon" n="mic-off" s="12" c="#ff9a9d" hint-size="12px,12px"></x-import></sc-if></span>
           <sc-if value="{{ call.hand }}"><span style="position:absolute;right:8px;top:8px;width:26px;height:26px;border-radius:50%;background:#ffd66b;color:#3d3100;display:grid;place-items:center;animation:gl-pop .35s var(--gl-ease-spring)"><x-import component-from-global-scope="GLIcon" n="hand" s="14" hint-size="14px,14px"></x-import></span></sc-if>
         </div>
@@ -3304,17 +3420,17 @@ class Component extends DCLogic {
 
   // ---------- live accounts (API) ----------
   sync(path,body,quiet){if(!LIVE)return Promise.resolve(null);if(LIVE.readOnly){this.toast('You’re viewing this account read-only.','eye');return Promise.resolve(null);}
-    return GLLive.api(path,body).then(r=>{this.refreshSoon();return r||{};}).catch(e=>{this.toast(e.message||'Something went wrong. Please try again.','circle-alert');if(e.status===401)this.signOut();return null;});}
+    return GLLive.api(path,body).then(r=>{this.refreshSoon();return r||{};}).catch(e=>{this.toast(e.message||'Something went wrong. Please try again.','circle-alert');if(e.status===401)this.signOut();if(e.status===402)this.openBuy();return null;});}
   refreshSoon(){clearTimeout(this._rf);this._rf=setTimeout(()=>this.refresh(),350);}
   refresh(){if(!LIVE)return Promise.resolve();
     if(LIVE.kind==='admin')return GLLive.api('admin/data').then(A=>this.applyAdmin(A,false)).catch(e=>{if(e.status===401)this.signOut();});
     return GLLive.api('portal/bootstrap').then(B=>this.loadLive(B,false)).catch(e=>{if(e.status===401&&!LIVE.readOnly)this.signOut();});}
-  resume(){const tok=GLLive.getToken();if(!tok){this.setState({stage:'signin'});return;}
+  resume(){if(this.handleAuthHash())return;const tok=GLLive.getToken();if(!tok){this.setState({stage:'signin'});return;}
     this.setState({stage:'sync',syncStep:0,signing:true,resuming:true});
     GLLive.api('auth/me').then(r=>this.startLive(r.user)).catch(e=>{if(e.status===401)GLLive.clearToken();this.setState({stage:'signin',signing:false,resuming:false,signErr:e.status===401?'':'We couldn’t reach Global Link. Check your connection, then sign in.'});});}
   startLive(user){
     if(user.role==='admin')return GLLive.api('admin/data').then(A=>{this.applyAdmin(A,true,user);this.startSync('admin');}).catch(e=>this.liveFail(e));
-    return GLLive.api('portal/bootstrap').then(B=>{this.loadLive(B,true);this.startSync(B.me.role==='tutor'?'tutor':'student');}).catch(e=>this.liveFail(e));}
+    return GLLive.api('portal/bootstrap').then(B=>{this.loadLive(B,true);this.startSync(B.me.role==='tutor'?'tutor':'student');this.handlePaidReturn();this.ensurePush();}).catch(e=>this.liveFail(e));}
   liveFail(e){if(e&&e.status===401)GLLive.clearToken();setDemo();this.setState({stage:'signin',signing:false,signErr:(e&&e.message)||'Couldn’t load your account. Please try again.'});}
   loadLive(B,initial){const prevUnread=LIVE&&LIVE.D&&LIVE.D.TH?LIVE.D.TH.reduce((a,x)=>a+x.unread,0):null;
     const D=GLLive.mapMember(B,{TI,PACKS,GROUPS:DEMO_SNAP.GROUPS});setLive({kind:'member',me:B.me,B,D,readOnly:!!B.readOnly});
@@ -3337,7 +3453,7 @@ class Component extends DCLogic {
   applyAdmin(A,initial,user){const me=user||(LIVE&&LIVE.me)||{name:'Jordan Reyes'};const D=GLLive.mapAdmin(A,{GROUPS:DEMO_SNAP.GROUPS});setLive({kind:'admin',me,A,D});
     const p={users:USERS.map(u=>({...u})),audit:AUDIT0.slice(),mq:MQ0.slice(),aLes:LESSONS_A.map(l=>l.slice()),txns:[],pkgs:PKG0.map(x=>({...x})),modQ:MOD0.slice(),modRules:D.modRules,annHist:D.annHist,announce:D.announce,flags:D.flags,maint:D.maint,myMats:D.MYMATS,aLib:D.ALIB,payDone:false};
     if(initial){p.aNotes=D.notes;p.asAdmin=false;Object.assign(p,{sessions:[],tasks:[],thS:[],thT:[],qs:[],tq:[],reqs:[],tReqs:[],posts:[],tAssigned:[],matProg:{},liked:{},ntTo:{}});}this.setState(p);}
-  signOut(){clearTimeout(this._saveT);GLLive.clearToken();setDemo();this.setState({...this.demoReset(),stage:'signin',meOpen:false,meTop:false,call:null,asAdmin:false,email:'',pw:'',otp:'',needOtp:false,signing:false,signErr:'',lumiOpen:false,palette:false,notifOpen:false,aUser:null,tourStep:null});}
+  signOut(){clearTimeout(this._saveT);this.recReset(true);if(LIVE&&LIVE.kind==='member'&&!LIVE.readOnly)this.dropPush(GLLive.getToken());GLLive.clearToken();setDemo();this.setState({...this.demoReset(),stage:'signin',meOpen:false,meTop:false,call:null,asAdmin:false,email:'',pw:'',otp:'',needOtp:false,signing:false,signErr:'',lumiOpen:false,palette:false,notifOpen:false,aUser:null,tourStep:null});}
   demoReset(){const I=this._init0||{};const o={};['sessions','tasks','thS','thT','qs','tq','reqs','tReqs','posts','users','audit','mq','aLes','txns','pkgs','modQ','annHist','myMats','tAssigned','matProg','satAns','sat','savedWords','liked','savedP','joined','rsvp','lumiMsgs','avail','flags','maint','announce','modRules','pinned','activeS','activeT','selStudent','selClass','replyFor','askTo','aNotes','count','displayName','pastReq'].forEach(k=>{o[k]=I[k];});o.aLib=null;return o;}
   enterDemo(role,fresh){setDemo();this.setState({...this.demoReset(),asAdmin:true,stage:'signin',call:null,meOpen:false,meTop:false,aUser:null});this.later(()=>{this.setState({email:role==='tutor'?'emma.carter@example.com':'mia.lin@example.com'});this.startSync(role,fresh);},30);}
   viewAs(au){if(au.role==='Parent'){this.toast('Parents don’t have a portal view yet.','info');return;}
@@ -3376,7 +3492,7 @@ class Component extends DCLogic {
     return on?'You have '+on+' mentor'+(on===1?'':'s')+' ready to teach you!':open?'We’re finding your mentor now. It usually takes a day or two.':'No mentor requests yet. You can ask for one from My mentors.';}
   liveVals(V){const s=this.state,t=this.isT(),L=LIVE,admin=L.kind==='admin';V.LIVE=true;V.DEMO=false;V.readOnly=!!L.readOnly;
     V.siteUrl=SITE_URL;V.appVersion=APP_VERSION;
-    if(admin){this.adminLiveVals(V);return;}
+    if(admin){this.adminLiveVals(V);this.liveVals2(V);return;}
     const D=L.D,me=L.me,nx=(s.sessions||[]).find(x=>x.next);const peerId=nx?(t?nx.who:nx.m):null;const peer=peerId?(STUDENTS[peerId]||MENTORS[peerId]||{name:'',first:''}):null;
     const nv=nx?this.viewSessLive(nx):null;
     V.lv={hasNext:!!nx,noNext:!nx,nextUpper:nv?('NEXT LESSON · '+nv.rel.toUpperCase()):'',nextCls:nv?nv.cls:'',nextTopic:nv?nv.topic:'',peerName:peer?peer.name:'',peerFirst:peer?(peer.first||GLLive.first(peer.name)):'',
@@ -3415,26 +3531,177 @@ class Component extends DCLogic {
     V.T={...V.T,matsEmpty:V.matsEmptyMsg,feedEmpty:V.feedEmptyMsg,satSetup:'Tell us your test date, your latest score and your goal. Your mentor builds your practice around it, and every practice test you log updates this page.',satDiag:'No problem. Start with a full practice test from College Board’s Bluebook app, then log your score here.',satAsk:'Ask your mentor to cover it next lesson',quizWait:pf+' is answering',quizDone:pf+' got it right',wordPop:'Pops up on '+pf+'’s screen with sound and 中文.',slides:'Your slides',endTitle:V.endTitle,endSub:'Thanks for joining. Your mentor’s notes will show up on your home screen.',feelNote:'Your mentor sees this. It helps them plan the next lesson.',leaveTitle:V.endTitle,leaveSub:'It lands on their home screen as a sticky note. Short and kind works best.'};
     V.qs=V.qs.map(q=>({...q,showPlay:false,hasAns:!!q.ans}));V.showStuds=!V.studsEmpty||!t;V.studsEmptyPage=t&&V.studsEmpty;V.isTutorRole=t;
     V.devSims=[];V.devAccounts=[];V.aPayouts=[];V.cap=['','',''];
-    V.clItems=V.clItems.map(x=>x.k==='hello'?{...x,t:t?'Say hi to your students':'Say hi to your mentor'}:x.k==='mentors'&&t?{...x,s:'Accept students Global Link sends you'}:x);}
+    V.clItems=V.clItems.map(x=>x.k==='hello'?{...x,t:t?'Say hi to your students':'Say hi to your mentor'}:x.k==='mentors'&&t?{...x,s:'Accept students Global Link sends you'}:x);
+    this.liveVals2(V);}
   adminLiveVals(V){const s=this.state,D=LIVE.D,U=s.users||[];V.clockA=D.clockA;V.clockB=D.clockB;V.me={name:LIVE.me.name||'Admin',photo:'',sub:'Admin · Global Link'};
     const live=(s.aLes||[]).filter(l=>l[5]==='Live');const today=(s.aLes||[]).filter(l=>!/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Tomorrow|Yesterday)/.test(l[0]));
     V.aLive=live.map(l=>({who:l[2]+' with '+l[3],cls:l[4]}));V.aHasLive=live.length>0;V.aNoLive=!live.length;
     const k=V.aKpis;const set=(i,v,sub)=>{if(k[i]){k[i].v=v;k[i].sub=sub;}};const stu=U.filter(u=>u.role==='Student'),men=U.filter(u=>u.role==='Mentor');const newToday=((D.signups||[])[(D.signups||[]).length-1]||{}).v||0;
     set(0,stu.length,newToday?newToday+' joined today':'No new sign-ups today');set(1,men.filter(u=>u.status==='Active').length+' active',men.filter(u=>u.status!=='Active').length+' paused');set(2,today.length,live.length?live.length+' live now':'None live right now');
-    set(3,'¥0','Payments not built yet');set(4,(s.mq||[]).length,(s.mq||[]).length?'oldest '+s.mq[0].wait:'All caught up');set(5,(s.modQ||[]).length,'from the community');
+    const A0=LIVE.A||{},mo=new Date().toISOString().slice(0,7),rev=(A0.payments||[]).filter(p=>p.status==='paid'&&new Date(p.paidAt||p.at).toISOString().slice(0,7)===mo).reduce((a,p)=>a+p.amount,0),pend=(A0.payments||[]).filter(p=>p.status==='pending').length;set(3,'¥'+rev.toLocaleString(),pend?pend+' waiting for payment':'This month');set(4,(s.mq||[]).length,(s.mq||[]).length?'oldest '+s.mq[0].wait:'All caught up');set(5,(s.modQ||[]).length,'from the community');
     const go=pg=>()=>this.go(pg);V.aTodos=[].concat((s.mq||[]).length?[{t:(s.mq||[]).length+' student'+((s.mq||[]).length===1?'':'s')+' waiting for a mentor',s:'Oldest: '+s.mq[0].name+', '+s.mq[0].wait,icon:'git-merge',bg:'rgba(240,170,40,.16)',fg:'#c98a12',go:go('a_matching')}]:[],
       (s.modQ||[]).length?[{t:(s.modQ||[]).length+' community report'+((s.modQ||[]).length===1?'':'s'),s:'Review and decide',icon:'shield-alert',bg:'rgba(229,72,77,.12)',fg:'var(--gl-danger)',go:go('a_moderation')}]:[],
       (D.support||[]).length?[{t:D.support.length+' message'+(D.support.length===1?'':'s')+' to the team',s:'From '+D.support[0].name,icon:'message-circle',bg:'var(--gl-tint)',fg:'var(--gl-blue)',go:go('a_people')}]:[]);
     V.aTodoN=V.aTodos.length;V.aTodoEmpty=!V.aTodos.length;
     V.notifs=V.aTodos.map((x,i)=>({id:'an'+i,icon:x.icon,t:x.t,s:x.s,time:'',dot:!s.notifRead}));if(!V.notifs.length)V.notifs=[{id:'an0',icon:'circle-check',t:'All caught up',s:'Nothing needs you right now',time:'',dot:false}];V.hasUnreadNotif=V.aTodos.length>0&&!s.notifRead;
-    V.aPayouts=[];V.aPayEmpty=true;V.aApprovePay=()=>this.toast('Payouts arrive with the payments system.','wallet');V.aPayPending=false;V.aTxnsEmpty=true;
-    V.aInteg=[['Accounts shared with globallink.com','Working','var(--gl-success)'],['Lumi (Gemini, then OpenRouter)','Working','var(--gl-success)'],['Google sign-in','Not set up','var(--gl-faint)'],['WeChat sign-in and Pay','Not built yet','var(--gl-faint)'],['Video lessons','Preview only','#d99a00']].map(([l,st,dot])=>({l,s:st,dot}));
+    V.aPayouts=[];V.aPayEmpty=true;V.aApprovePay=()=>this.go('a_payments');V.aPayPending=false;V.aTxnsEmpty=true;
+    V.aInteg=[['Accounts shared with globallink.com','Working','var(--gl-success)'],['Lumi (Gemini, then OpenRouter)','Working','var(--gl-success)'],['Google sign-in',A0.google?'Working':'Not set up',A0.google?'var(--gl-success)':'var(--gl-faint)'],['Card payments (Stripe)',A0.stripe?'Working':'Not set up',A0.stripe?'var(--gl-success)':'var(--gl-faint)'],['Email (Resend)',A0.email?'Working':'Not set up',A0.email?'var(--gl-success)':'var(--gl-faint)'],['Push notifications',A0.push?'Working':'Not set up',A0.push?'var(--gl-success)':'var(--gl-faint)'],['WeChat payments','Confirmed by the team','var(--gl-success)'],['Video lessons','Preview only','#d99a00']].map(([l,st,dot])=>({l,s:st,dot}));
     V.aVers=[['Windows','monitor',APP_VERSION,'Updates automatically'],['macOS','laptop',APP_VERSION,'Updates automatically'],['Web','globe',APP_VERSION,'Always latest']].map(([l,icon,ver,on])=>({l,icon,ver,on,btn:l==='Web'?'Reload all':'Force update',force:()=>{this.sync('admin/config',{key:'reloadAt',value:Date.now(),audit:l==='Web'?'Reloaded all web sessions':'Asked '+l+' apps to check for updates',icon:'refresh-cw'});this.toast(l==='Web'?'Open portals refresh within a minute':l+' apps check for updates within a minute','refresh-cw');}}));
     V.devSims=V.devSims.filter((_,i)=>i===3);V.aSupport=(D.support||[]).map(x=>({...x,when:GLLive.ago(x.at),open:()=>{const u=(s.users||[]).find(y=>y.id===x.userId);if(u)this.setState({aUser:u.id,aMsgOpen:true,aMsgText:''});}}));V.aHasSupport=V.aSupport.length>0;
     const au=U.find(u=>u.id===s.aUser);V.aMsgOpen=!!s.aMsgOpen&&!!au;V.aMsgText=s.aMsgText||'';V.setAMsgText=v=>this.setState({aMsgText:v});V.aMsgThread=(s.aThread||[]).map(m=>({...m,them:!m.me,align:m.me?'end':'start'}));
     V.aMsgSend=()=>{const tx=(s.aMsgText||'').trim();if(!au||!tx)return;this.sync('admin/message',{to:au.id,text:tx}).then(ok=>{if(ok){this.setState({aMsgText:''});this.loadThread(au.id);this.toast('Sent to '+au.name+' as the Global Link team','send');}});};
     V.aMsgClose=()=>this.setState({aMsgOpen:false});}
   loadThread(id){GLLive.api('admin/thread?id='+encodeURIComponent(id)).then(r=>this.setState({aThread:r.msgs})).catch(()=>{});}
+
+  // ---------- Google sign-in ----------
+  providers(){if(!this._prov)this._prov=GLLive.api('auth/providers').catch(()=>({}));return this._prov;}
+  googleSignIn(){this.providers().then(p=>{if(!p||!p.google){this.toast('Google sign-in isn’t switched on yet. Use your globallink.com username and password.','log-in');return;}
+    const d=window.glDesktop;if(d){d.openExternal(location.origin+'/api/auth/google?desktop=1');this.toast('Finish signing in with Google in your browser, then come back here.','log-in');}else location.href='/api/auth/google';});}
+  handleAuthHash(){const h=location.hash||'';let m;
+    if((m=/^#\/oauth\/([A-Za-z0-9_-]{20,})$/.exec(h))){history.replaceState(null,'',location.pathname+location.search);this.setState({stage:'sync',syncStep:0,signing:true,resuming:true});
+      GLLive.api('auth/oauth',{code:m[1]}).then(r=>{GLLive.setToken(r.token,true);return this.startLive(r.user);}).catch(e=>this.setState({stage:'signin',signing:false,resuming:false,signErr:e.message}));return true;}
+    if((m=/^#\/oauth-error\/([a-z-]+)(?:\/(.*))?$/.exec(h))){history.replaceState(null,'',location.pathname+location.search);
+      const why={'no-account':'There’s no Global Link account for '+decodeURIComponent(m[2]||'that Google account')+' yet. Create one on globallink.com (you can sign up with Google there), then sign in here.',suspended:'This account is paused. Contact support@globallink.com.','not-configured':'Google sign-in isn’t switched on yet. Use your username and password.'}[m[1]]||'Google sign-in didn’t finish. Please try again.';
+      this.setState({stage:'signin',signErr:why});return true;}
+    return false;}
+  handlePaidReturn(){const q=new URLSearchParams(location.search),id=q.get('paid');if(!id)return;history.replaceState(null,'',location.pathname+location.hash);
+    if(id==='cancelled'){this.toast('Payment cancelled. Nothing was charged.','x');return;}
+    GLLive.api('portal/checkout-status',{sessionId:id}).then(r=>{this.toast(r.paid?'Payment received. Your lesson credits are ready!':'We’re still confirming your payment. Credits appear as soon as it clears.',r.paid?'party-popper':'clock');this.refreshSoon();}).catch(()=>{});}
+
+  // ---------- push notifications ----------
+  b64key(s){const b=atob((s+'='.repeat((4-s.length%4)%4)).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(b,c=>c.charCodeAt(0));}
+  ensurePush(){try{const L=LIVE;if(!L||L.kind!=='member'||L.readOnly||!L.B||!L.B.vapid)return;
+    if(!('serviceWorker' in navigator)||!('PushManager' in window)||typeof Notification==='undefined'||Notification.permission!=='granted')return;
+    navigator.serviceWorker.getRegistration().then(reg=>{if(!reg)return;return reg.pushManager.getSubscription().then(sub=>sub||reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:this.b64key(L.B.vapid)})).then(sub=>GLLive.api('portal/push-subscribe',sub.toJSON()));}).catch(()=>{});}catch(e){}}
+  dropPush(token){try{if(!('serviceWorker' in navigator))return;navigator.serviceWorker.getRegistration().then(reg=>reg&&reg.pushManager&&reg.pushManager.getSubscription()).then(sub=>{if(!sub)return;
+    return GLLive.api('portal/push-unsubscribe',{endpoint:sub.endpoint},{token}).catch(()=>{}).then(()=>sub.unsubscribe());}).catch(()=>{});}catch(e){}}
+
+  // ---------- recording (voice notes, video replies) ----------
+  recStart(kind,task){if(LIVE&&LIVE.readOnly){this.toast('You’re viewing this account read-only.','eye');return;}
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||typeof MediaRecorder==='undefined'){this.toast('Recording isn’t supported in this browser. Try Chrome, Edge or Safari.','mic-off');return;}
+    const video=kind==='video';this.recReset(true);
+    navigator.mediaDevices.getUserMedia(video?{video:{width:{ideal:640},height:{ideal:480},facingMode:'user'},audio:true}:{audio:true}).then(st=>{
+      const types=video?['video/mp4','video/webm;codecs=vp8,opus','video/webm']:['audio/mp4','audio/webm;codecs=opus','audio/webm'];
+      const mime=types.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||'';
+      const rec=new MediaRecorder(st,Object.assign(mime?{mimeType:mime}:{},{audioBitsPerSecond:32000},video?{videoBitsPerSecond:250000}:{}));
+      const chunks=[];rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};
+      rec.onstop=()=>{st.getTracks().forEach(t=>t.stop());const blob=new Blob(chunks,{type:(rec.mimeType||mime||(video?'video/webm':'audio/webm')).split(';')[0]});
+        if(this._rec){this._rec.blob=blob;this._rec.secs=Math.round((Date.now()-this._rec.started)/1000);this._rec.url=URL.createObjectURL(blob);}
+        const v=document.getElementById('gl-rec-video');if(video&&v){v.srcObject=null;v.src=this._rec?this._rec.url:'';v.muted=false;v.controls=true;}};
+      this._rec={kind,rec,stream:st,task:task&&task.taskId,taskTitle:task&&task.title,started:Date.now()};rec.start(1000);
+      const v=document.getElementById('gl-rec-video');if(video&&v){v.srcObject=st;v.muted=true;v.controls=false;v.play().catch(()=>{});}
+      clearTimeout(this._recT);this._recT=setTimeout(()=>this.recStop(),video?120000:180000);
+      this.setState(video?{recOn:true,recSecs:0,recDone:false}:{taskRec:'rec',taskSecs:0});
+    }).catch(e=>this.toast(e&&e.name==='NotAllowedError'?'Allow the '+(video?'camera and ':'')+'microphone to record.':'No '+(video?'camera':'microphone')+' found.','mic-off'));}
+  recStop(){clearTimeout(this._recT);const r=this._rec;if(r&&r.rec&&r.rec.state!=='inactive')r.rec.stop();if(r)this.setState(r.kind==='video'?{recOn:false,recDone:true}:{taskRec:'done'});}
+  recReset(quiet){clearTimeout(this._recT);const r=this._rec;if(r){try{if(r.rec.state!=='inactive')r.rec.stop();}catch(e){}r.stream.getTracks().forEach(t=>t.stop());}this._rec=null;
+    const v=document.getElementById('gl-rec-video');if(v){v.srcObject=null;v.removeAttribute('src');v.controls=false;}if(!quiet)this.setState({taskRec:null,taskSecs:0,recOn:false,recDone:false,recSecs:0});}
+  recUpload(){const r=this._rec;if(!r||!r.blob)return Promise.reject(new Error('Record something first.'));
+    const ext=/mp4/.test(r.blob.type)?(r.kind==='video'?'mp4':'m4a'):'webm';
+    return GLLive.upload(r.blob,{kind:r.kind==='video'?'video':'voice',name:(r.kind==='video'?'video-reply':'voice-note')+'.'+ext,type:r.blob.type,secs:r.secs});}
+  recSendTask(){const r=this._rec;if(!r||!r.task)return;this.toast('Sending your voice note…','send');
+    this.recUpload().then(file=>this.sync('portal/task',{op:'submit',id:r.task,file})).then(ok=>{if(ok){this.recReset();this.toast('Voice note sent to your mentor','send');}}).catch(e=>this.toast(e.message,'info'));}
+
+  // ---------- files ----------
+  pickFile(accept,cb){const i=document.createElement('input');i.type='file';i.accept=accept;i.onchange=()=>{const f=i.files&&i.files[0];if(!f)return;if(f.size>4e6){this.toast('Files can be up to 4 MB.','info');return;}cb(f);};i.click();}
+  attach(){if(!LIVE||LIVE.kind!=='member'){this.toast('Attachments work in real accounts.','paperclip');return;}if(LIVE.readOnly){this.toast('You’re viewing this account read-only.','eye');return;}
+    const t=this.isT(),key=t?'thT':'thS',ak=t?'activeT':'activeS';const th=(this.state[key]||[]).find(x=>x.id===this.state[ak])||(this.state[key]||[])[0];if(!th)return;
+    if(th.canSend===false){this.toast('You can message your mentors, your students and the Global Link team.','info');return;}
+    this.pickFile('image/*,audio/*,video/*,.pdf,.doc,.docx,.ppt,.pptx,.txt',f=>{this.toast('Sending '+f.name+'…','upload');
+      GLLive.upload(f,{kind:/^image\//.test(f.type)?'image':'file',name:f.name,type:f.type}).then(file=>this.sync('portal/message',{to:th.id,text:'',file})).then(r=>{if(r)this.toast('Sent','send');}).catch(e=>this.toast(e.message,'info'));});}
+  uploadMaterial(){this.pickFile('.pdf,.doc,.docx,.ppt,.pptx,image/*,audio/*,video/*',f=>{this.toast('Uploading '+f.name+'…','upload');
+    const type=/\.pdf$/i.test(f.name)?'PDF':/^video\//.test(f.type)?'Video':/^audio\//.test(f.type)?'Recording':/^image\//.test(f.type)?'Slides':'Reading';
+    GLLive.upload(f,{kind:'material',name:f.name,type:f.type}).then(file=>this.sync('portal/material',{title:f.name.replace(/\.[^.]+$/,'').slice(0,150),type,pack:'free',level:'Intermediate',blocks:[{id:'b1',k:'m',text:f.name,file}],status:'Private'}))
+      .then(r=>{if(r)this.toast('Uploaded to your materials','upload');}).catch(e=>this.toast(e.message,'info'));});}
+  uploadToBuilder(){this.pickFile('image/*,audio/*,video/*,.pdf',f=>{this.toast('Uploading '+f.name+'…','upload');
+    GLLive.upload(f,{kind:'material',name:f.name,type:f.type}).then(file=>{this.setState(x=>x.bld?{bld:{...x.bld,mode:'edit',blocks:x.bld.blocks.concat([{...bk('m',{text:f.name}),file}])}}:null);this.toast('Added to the material','check');}).catch(e=>this.toast(e.message,'info'));});}
+
+  // ---------- buying lessons ----------
+  openBuy(){if(!LIVE||LIVE.kind!=='member'||this.isT()){this.toast('Opening plans on globallink.com','external-link');return;}
+    const pk=(LIVE.D.pkgs||[]).filter(p=>Number(p.price)>0);this.setState({buyOpen:true,buyPack:(pk[1]||pk[0]||{}).id,buySent:false});}
+  buyNow(method){const s=this.state;if(LIVE&&LIVE.readOnly){this.toast('You’re viewing this account read-only.','eye');return;}if(!s.buyPack){this.toast('Pick a plan first','info');return;}
+    GLLive.api('portal/buy',{packId:s.buyPack,method}).then(r=>{if(r.url){location.href=r.url;return;}this.setState({buySent:true});this.refreshSoon();}).catch(e=>this.toast(e.message,'info'));}
+  buyVals(){const s=this.state,D=(LIVE&&LIVE.D)||{},info=D.payInfo||{};const NAMES={free:'Free lessons',conv:'Conversation',pron:'Pronunciation',ielts:'IELTS Speaking',sat:'SAT Math'};
+    const packs=(D.pkgs||[]).filter(p=>Number(p.price)>0).map(p=>{const on=s.buyPack===p.id;return {name:p.name,price:Number(p.price).toLocaleString(),sub:p.credits+' lesson'+(p.credits===1?'':'s')+' · about ¥'+Math.round(Number(p.price)/Math.max(1,p.credits))+' each',bd:on?'var(--gl-blue)':'var(--gl-line)',bg:on?'var(--gl-tint)':'var(--gl-card)',dot:on?'var(--gl-blue)':'transparent',pick:()=>this.setState({buyPack:p.id,buySent:false})};});
+    const ST={pending:['Waiting','#c98a12'],paid:['Paid','var(--gl-success)'],refunded:['Refunded','var(--gl-faint)'],cancelled:['Cancelled','var(--gl-faint)'],expired:['Expired','var(--gl-faint)']};
+    return {credits:D.credits||0,packs,stripe:!!info.stripe,sent:!!s.buySent,notSent:!s.buySent,packsLabel:(D.packs||[]).length?'Includes: '+(D.packs||[]).map(k=>NAMES[k]||k).join(', '):'One credit is one 40-minute lesson',
+      wechatText:'Most families pay us on WeChat. Send a request and we’ll message you the details'+(info.wechatId?' (our WeChat ID is '+info.wechatId+')':'')+'. Your lesson credits are added as soon as the payment arrives, usually within a day.',
+      history:(D.payments||[]).slice(0,6).map(p=>({name:p.name,amount:Number(p.amount).toLocaleString(),when:GLLive.ago(p.at),status:(ST[p.status]||[p.status])[0],fg:(ST[p.status]||[0,'var(--gl-muted)'])[1]})),hasHistory:(D.payments||[]).length>0};}
+
+  // ---------- events ----------
+  openEventForm(){const d=new Date(Date.now()+3*864e5);d.setMinutes(0,0,0);const pad=n=>String(n).padStart(2,'0');
+    this.setState({evFormOpen:true,evf:{title:'',kind:'Live Q&A',when:d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':00',dur:45,link:'',body:''}});}
+  evfVals(){const f=this.state.evf||{},up=p=>this.setState(x=>({evf:{...(x.evf||{}),...p}}));
+    return {...f,setTitle:v=>up({title:v}),setLink:v=>up({link:v}),setBody:v=>up({body:v}),setWhen:e=>up({when:e.target.value}),
+      kinds:['Live Q&A','Workshop','Club','Social'].map(l=>({l,variant:f.kind===l?'selected':'soft',pick:()=>up({kind:l})})),
+      durs:[30,45,60,90].map(n=>({l:n+' min',variant:f.dur===n?'selected':'soft',pick:()=>up({dur:n})})),
+      post:()=>{const start=new Date(f.when).getTime();this.sync(LIVE&&LIVE.kind==='admin'?'admin/event':'portal/event',{title:f.title,kind:f.kind,start,dur:f.dur,link:f.link,body:f.body}).then(r=>{if(r){this.setState({evFormOpen:false});this.toast('Event posted','calendar-check');}});}};}
+
+  // ---------- AI Practice ----------
+  practiceVals(){const s=this.state,today=new Date().toISOString().slice(0,10),pr=s.practice||{},done=pr.day===today?(pr.done||[]):[],words=s.savedWords||[];
+    const N=[['warm','Daily warm-up','Tell Lumi about your day','sparkles','Start a warm-up chat with me. Ask me one simple question about my day, then gently correct one mistake in my answer.'],
+      ['words','Word review',words.length?words.length+' saved words':'Save words from lessons first','languages',words.length?'Quiz me on these words one at a time, with a Chinese hint: '+words.slice(-12).join(', ')+'.':'Teach me 5 useful everyday English words with their Chinese meanings, then quiz me on them.'],
+      ['story','Telling a story','Past tense practice','book-open','Help me tell a short story about something I did last weekend, in the past tense. Ask me one question at a time.'],
+      ['interview','Interview basics','For school and college interviews','mic','Pretend to be a friendly college interviewer. Ask me one interview question at a time and give me short feedback.'],
+      ['review','Mixed review','A bit of everything','award','Give me a short mixed review: one vocabulary question, one grammar question and one speaking prompt about my goal: '+(s.goal||'speaking English with confidence')+'.']];
+    const days=new Set(pr.days||[]);let streak=0;for(let i=0;i<400;i++){const d=new Date(Date.now()-i*864e5).toISOString().slice(0,10);if(days.has(d))streak++;else if(i>0)break;}
+    return {streakLabel:streak?streak+'-day streak':'Start your streak today',nodes:N.map(([id,label,sub,icon,prompt])=>{const ok=done.includes(id);
+      return {label,sub,icon,state:ok?'DONE TODAY':'START',stateFg:ok?'var(--gl-success)':'var(--gl-link)',bd:ok?'rgba(34,165,101,.4)':'var(--gl-line)',bg:ok?'rgba(34,165,101,.06)':'var(--gl-card)',iconBg:ok?'var(--gl-success)':'var(--gl-tint)',iconFg:ok?'#fff':'var(--gl-blue)',
+        go:()=>{this._practiceId=id;this.setState({lumiDraft:prompt});this.toast('Lumi is ready. Press send to start.','sparkles');}};})};}
+  markPractice(){const id=this._practiceId;if(!id)return;this._practiceId=null;const today=new Date().toISOString().slice(0,10);
+    this.setState(x=>{const pr=x.practice||{},done=pr.day===today?(pr.done||[]):[];return {practice:{day:today,done:Array.from(new Set(done.concat([id]))),days:(pr.days||[]).filter(d=>d!==today).concat([today]).slice(-90)}};});}
+
+  // ---------- material viewer ----------
+  matViewer(){const s=this.state,m=s.matOpen?MATS.find(x=>x.id===s.matOpen):null;if(!LIVE||!m||!m.blocks||!m.blocks.length)return {has:false};
+    const ans=(s.matAns||{})[m.id]||{},bid=(b,i)=>b.id||('b'+i),qs=m.blocks.map((b,i)=>[b,bid(b,i)]).filter(([b])=>b.k==='q'),answered=qs.filter(([,id])=>ans[id]!==undefined).length;
+    const blocks=m.blocks.map((b,i)=>{const id=bid(b,i),a=ans[id],f=b.file||null,ok=b.ok||0;
+      return {text:b.text||'',zh:b.zh||'',ex:b.ex||'',isH:b.k==='h',isT:b.k==='t',isQ:b.k==='q',isV:b.k==='v',isP:b.k==='p',isM:b.k==='m',answered:a!==undefined,res:a===ok?'Correct!':'Not quite. The answer is '+'ABC'[ok]+'.',resFg:a===ok?'var(--gl-success)':'var(--gl-danger)',
+        secL:(b.sec||60)>=60?Math.round((b.sec||60)/60)+' min':b.sec+' sec',say:()=>this.say(b.text||''),url:f?f.url:'',name:f?f.name:'',
+        isImage:!!(f&&/^image\//.test(f.type)),isAudio:!!(f&&/^audio\//.test(f.type)),isVideo:!!(f&&/^video\//.test(f.type)),isDoc:!!(f&&!/^(audio|image|video)\//.test(f.type)),
+        opts:(b.opts||[]).map((t,oi)=>({t:t||'Choice '+(oi+1),letter:'ABC'[oi],bd:a!==undefined&&oi===ok?'var(--gl-success)':a===oi?'var(--gl-danger)':'var(--gl-line)',bg:a!==undefined&&oi===ok?'rgba(34,165,101,.12)':a===oi?'rgba(229,72,77,.1)':'var(--gl-card)',
+          pick:()=>{if(a!==undefined)return;const na={...ans,[id]:oi},n=qs.filter(([,q])=>na[q]!==undefined).length,pct=Math.round(n/Math.max(1,qs.length)*100);
+            this.setState(x=>({matAns:{...(x.matAns||{}),[m.id]:na},matProg:{...(x.matProg||{}),[m.id]:Math.max(pct,(x.matProg||{})[m.id]||0)}}));
+            if(m.asgId&&!(LIVE&&LIVE.readOnly))GLLive.api('portal/progress',{id:m.asgId,progress:pct}).catch(()=>{});}}))};});
+    return {has:true,blocks,progressLabel:qs.length?answered+' of '+qs.length+' questions answered':'Nothing to answer here. Read or watch it, then you’re done.'};}
+
+  // ---------- extra values on top of liveVals() ----------
+  liveVals2(V){const s=this.state,t=this.isT(),admin=LIVE.kind==='admin';
+    V.openEventForm=()=>this.openEventForm();V.closeEventForm=()=>this.setState({evFormOpen:false});V.evFormOpen=!!s.evFormOpen;V.evf=this.evfVals();
+    if(admin){this.adminLiveVals2(V);return;}
+    V.attachFile=()=>this.attach();V.T={...V.T,recBg:'#0c1730',matW:'600px'};
+    const r=this._rec;
+    V.tasksShown=V.tasksShown.map(k=>{const mine=!!(r&&r.task&&r.task===k.taskId);return {...k,startRec:()=>this.recStart('task',k),recIdle:!!k.isRec&&!(mine&&s.taskRec),recOn:!!k.isRec&&mine&&s.taskRec==='rec',recReady:!!k.isRec&&mine&&s.taskRec==='done'};});
+    V.stopTaskRec=()=>this.recStop();V.redoTaskRec=()=>this.recReset();V.submitTaskRec=()=>this.recSendTask();
+    V.startRec=()=>this.recStart('video');V.stopRec=()=>this.recStop();V.redoRec=()=>this.recReset();
+    const rq=V.rq&&V.rq.qid?V.rq:null,textSend=V.sendReply;
+    if(rq&&rq.isVideo)V.sendReply=()=>{if(!this._rec||!this._rec.blob){this.toast('Record your reply first','video');return;}this.toast('Sending your video…','send');
+      this.recUpload().then(file=>this.sync('portal/answer',{id:rq.qid,text:(s.replyText||'').trim(),video:file})).then(ok=>{if(ok){this.recReset();this.setState({replyText:''});this.toast('Video reply sent to '+rq.first,'send');}}).catch(e=>this.toast(e.message,'info'));};
+    else V.sendReply=textSend;
+    V.qs=V.qs.map(q=>({...q,showPlay:q.answered&&!!q.video}));
+    V.events=V.events.map(e=>({...e,hasLink:!!e.link}));V.canHostEvent=t;
+    V.buyOpen=!!s.buyOpen;V.buy=this.buyVals();V.openBuy=()=>this.openBuy();V.closeBuy=()=>this.setState({buyOpen:false});V.buyWechat=()=>this.buyNow('wechat');V.buyStripe=()=>this.buyNow('stripe');
+    V.lk={...V.lk,buy:()=>this.openBuy()};
+    V.pr=this.practiceVals();V.mv=this.matViewer();
+    const ms=s.matOpen?MATS.find(x=>x.id===s.matOpen):null,mf=ms&&(ms.blocks||[]).find(b=>b.file);
+    V.matDownload=()=>{if(mf)window.open(mf.file.url,'_blank','noopener');else this.toast('This material opens right here in the app.','book-open');};
+    V.askPerm=()=>{try{Notification.requestPermission().then(p=>{this.setState({notifPerm:p});if(p==='granted'){this.markSetup('notif');this.ensurePush();this.toast('Notifications are on','bell');}});}catch(e){this.setState({notifPerm:'unsupported'});}};
+    if(t){V.libUpload=()=>this.uploadMaterial();V.bldUpload=()=>this.uploadToBuilder();}}
+  adminLiveVals2(V){const s=this.state,A=LIVE.A||{},R=s.apRec||{},up=p=>this.setState(x=>({apRec:{...(x.apRec||{}),...p}}));
+    const pays=A.payments||[],month=new Date().toISOString().slice(0,7),money=n=>'¥'+Number(n||0).toLocaleString();
+    const MT={wechat:'WeChat',stripe:'Card / Stripe',alipay:'Alipay',cash:'Cash',bank:'Bank transfer'},ST={pending:['WAITING','#c98a12'],paid:['PAID','var(--gl-success)'],refunded:['REFUNDED','var(--gl-faint)'],cancelled:['CANCELLED','var(--gl-faint)'],expired:['EXPIRED','var(--gl-faint)']};
+    const recv=pays.filter(p=>p.status==='paid'&&new Date(p.paidAt||p.at).toISOString().slice(0,7)===month).reduce((a,p)=>a+p.amount,0);
+    const due=(A.payouts||[]).filter(p=>!p.paid).reduce((a,p)=>a+p.amount,0);
+    const pkgs=(A.config&&A.config.pkgs)||[];
+    V.ap={kpis:[['RECEIVED THIS MONTH',money(recv),pays.filter(p=>p.status==='paid').length+' paid in total'],['WAITING FOR PAYMENT',pays.filter(p=>p.status==='pending').length,'requests from the app'],['MENTOR PAYOUTS DUE','$'+due,'finished lessons not yet paid']].map(([l,v,s2])=>({l,v,s:s2})),
+      stripeLine:A.stripe?'Card, Alipay and WeChat Pay through Stripe are on in the app.':'Paying by card in the app (Stripe) is off until STRIPE_SECRET_KEY is set.',
+      pending:pays.filter(p=>p.status==='pending').map(p=>({...p,amount:Number(p.amount).toLocaleString(),when:GLLive.ago(p.at),confirm:()=>this.sync('admin/payment',{op:'confirm',id:p.id}).then(ok=>{if(ok)this.toast('Payment recorded. '+p.credits+' credits added for '+p.who,'wallet');}),cancel:()=>this.sync('admin/payment',{op:'cancel',id:p.id})})),
+      all:pays.filter(p=>p.status!=='pending').slice(0,60).map(p=>({...p,amount:Number(p.amount).toLocaleString(),method:MT[p.method]||p.method,when:GLLive.ago(p.paidAt||p.at),status:(ST[p.status]||[p.status])[0],fg:(ST[p.status]||[0,'var(--gl-muted)'])[1],deco:p.status==='refunded'?'line-through':'none',canRefund:p.status==='paid',refund:()=>this.sync('admin/payment',{op:'refund',id:p.id}).then(ok=>{if(ok)this.toast('Refunded. Credits removed.','undo-2');})})),
+      studentOpts:(s.users||[]).filter(u=>u.role==='Student').map(u=>({value:u.id,label:u.name})),packOpts:pkgs.map(p=>({value:p.id,label:p.name+' · ¥'+p.price})),
+      recUser:R.user,recPack:R.pack,recAmount:R.amount||'',recNote:R.note||'',setRecUser:v=>up({user:v}),setRecPack:v=>{const p=pkgs.find(x=>x.id===v);up({pack:v,amount:p?String(p.price):''});},setRecAmount:v=>up({amount:String(v).replace(/[^0-9]/g,'')}),setRecNote:v=>up({note:v}),
+      record:()=>{if(!R.user||!R.pack){this.toast('Pick a student and a plan','info');return;}this.sync('admin/payment',{op:'record',userId:R.user,packId:R.pack,amount:Number(R.amount||0),note:R.note||''}).then(ok=>{if(ok){this.setState({apRec:{}});this.toast('Payment recorded and credits added','wallet');}});},
+      payouts:(A.payouts||[]).map(p=>({...p,unpaid:!p.paid,pay:()=>this.sync('admin/payout',{tutorId:p.tutorId,month:p.month}).then(ok=>{if(ok)this.toast('Payout marked paid. '+p.name+' was told.','wallet');})})),rateLabel:'$'+(A.rate||20)+' a lesson'};
+    V.ap.pendingEmpty=!V.ap.pending.length;V.ap.allEmpty=!V.ap.all.length;V.ap.payoutsEmpty=!V.ap.payouts.length;
+    V.aEvents=(A.events||[]).map(e=>({...e,when:new Date(e.start).toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}),remove:()=>this.sync('admin/event',{op:'delete',id:e.id})}));V.aEventsEmpty=!V.aEvents.length;}
 
   resolvedTheme(){const m=this.state.themeMode||this.props.theme||'light';if(m==='auto'){const h=new Date().getHours();return (h>=19||h<7)?'dark':'light';}return m;}
 
@@ -3476,6 +3743,7 @@ class Component extends DCLogic {
     const msgs=this.state.lumiMsgs.concat([{from:'user',t:txt}]);this.setState({lumiMsgs:msgs,lumiDraft:'',lumiBusy:true});this.markSetup('lumi');
     let reply='';
     try{reply=(await GLLive.api('portal/lumi',{messages:msgs.slice(-12).map(m=>({role:m.from==='bot'?'assistant':'user',content:m.t}))})).text;}catch(e){if(e&&e.status===429)reply=e.message;}
+    if(LIVE&&reply)this.markPractice();
     if(!reply)reply=LIVE?'Lumi is resting for a moment. Please try again soon.':'Nice! A small tip: say "I went hiking with my family" instead of "I go hiking". What was your favorite moment?';
     this.setState(s=>({lumiMsgs:s.lumiMsgs.concat([{from:'bot',t:String(reply).trim()}]),lumiBusy:false}));}
 
@@ -3627,7 +3895,7 @@ class Component extends DCLogic {
       cycleTheme:()=>this.setState({themeMode:theme==='dark'?'light':'dark'}),
       showSignin:s.stage==='signin',showSync:s.stage==='sync',showApp:s.stage==='app',
       email:s.email,pw:s.pw,signErr:s.signErr,signing:s.signing,setEmail:v=>this.setState({email:v,signErr:''}),setPw:v=>this.setState({pw:v}),
-      signIn:()=>this.signIn(),signInWeChat:()=>this.toast('WeChat sign-in is coming soon. Use your globallink.com username and password for now.','message-circle'),signInGoogle:()=>this.toast('Google sign-in is coming to the app soon. Use your globallink.com username and password for now.','log-in'),asStudent:()=>{this.setState({email:'mia.lin@example.com'});this.startSync('student');},asNewStudent:()=>{this.setState({email:'mia.lin@example.com'});this.startSync('student',true);},asNewTutor:()=>{this.setState({email:'emma.carter@example.com'});this.startSync('tutor',true);},asTutor:()=>{this.setState({email:'emma.carter@example.com'});this.startSync('tutor');},
+      signIn:()=>this.signIn(),signInWeChat:()=>this.toast('WeChat sign-in is coming soon. Use your globallink.com username and password for now.','message-circle'),signInGoogle:()=>this.googleSignIn(),asStudent:()=>{this.setState({email:'mia.lin@example.com'});this.startSync('student');},asNewStudent:()=>{this.setState({email:'mia.lin@example.com'});this.startSync('student',true);},asNewTutor:()=>{this.setState({email:'emma.carter@example.com'});this.startSync('tutor',true);},asTutor:()=>{this.setState({email:'emma.carter@example.com'});this.startSync('tutor');},
       syncTitle:LIVE&&LIVE.me?'Welcome, '+GLLive.first(LIVE.me.name):s.resuming?'Welcome back':(t?'Welcome, Emma':'Welcome, Mia'),syncItems,
       sideW:expanded?236:68,expanded,labelOp:expanded?1:0,badgePos:expanded?'static':'absolute',navPad:expanded?10:12,btnPad:expanded?12:13,btnMin:expanded?0:44,bSize:expanded?20:16,bPad:expanded?6:4,bFont:expanded?11:9.5,bRing:expanded?'none':'0 0 0 2px var(--gl-hero)',sideIcon:expanded?'panel-left-close':'panel-left-open',toggleSide:()=>this.setState(st=>({collapsed:!st.collapsed})),
       roleIcon:t?'graduation-cap':'backpack',roleLabel:lang==='zh'?(t?'导师空间':'学生空间'):(t?'Mentor space':'Student space'),
@@ -4072,7 +4340,7 @@ class Component extends DCLogic {
     V.feed=feed.map(pv);V.feedEmpty=V.feed.length===0;V.topPosts=s.posts.slice().sort((a,b)=>b.likes-a.likes).slice(0,3).map(pv);
     V.comFilters=['All','Discussion','Q&A','Wins'].map(l=>({label:l,variant:s.comFilter===l?'selected':'soft',pick:()=>this.setState({comFilter:l})}));
     V.comSort=s.comSort;V.setComSort=v=>this.setState({comSort:v});V.sortOpts=[{value:'latest',label:'Latest'},{value:'top',label:'Popular'}];V.cmDraft=s.cmDraft;V.setCmDraft=e=>this.setState({cmDraft:e.target.value});
-    const evv=e=>{const h=MENTORS[e.host];const on=!!s.rsvp[e.id];return {...e,hostName:h.name,hostPhoto:h.photo,mine:t?e.ca:e.bj,other:t?e.bj:e.ca,goingLabel:(e.going+(on?1:0))+' going',rsvpBg:on?'var(--gl-success)':'var(--gl-tint)',rsvpFg:on?'#fff':'var(--gl-link)',rsvpLabel:on?'Going ✓':'I’m going',rsvpGo:()=>{this.setState(x=>({rsvp:{...x.rsvp,[e.id]:!x.rsvp[e.id]}}));if(!on)this.toast('You’re in. We’ll remind you 10 minutes before.','calendar-check');}};};
+    const evv=e=>{const h=MENTORS[e.host];const on=!!s.rsvp[e.id];return {...e,hostName:h.name,hostPhoto:h.photo,mine:t?e.ca:e.bj,other:t?e.bj:e.ca,goingLabel:(e.going+(on?1:0))+' going',rsvpBg:on?'var(--gl-success)':'var(--gl-tint)',rsvpFg:on?'#fff':'var(--gl-link)',rsvpLabel:on?'Going ✓':'I’m going',rsvpGo:()=>{if(LIVE)this.sync('portal/rsvp',{id:e.id,on:!on},true);this.setState(x=>({rsvp:{...x.rsvp,[e.id]:!x.rsvp[e.id]}}));if(!on)this.toast('You’re in. We’ll remind you 10 minutes before.','calendar-check');}};};
     V.events=EVENTS.map(evv);V.ev0=EVENTS[0]?evv(EVENTS[0]):{};V.hasEvents=EVENTS.length>0;V.noEvents=!EVENTS.length;
     V.groups=GROUPS.map(g=>{const on=!!s.joined[g.id];return {...g,membersN:(g.members+(on?1:0)).toLocaleString(),label:on?'Joined ✓':'Join group',bg:on?'var(--gl-tint)':'var(--gl-grad-cta)',fg:on?'var(--gl-link)':'#fff',bd:on?'1px solid var(--gl-blue-soft)':'0',toggle:()=>{this.setState(x=>({joined:{...x.joined,[g.id]:!x.joined[g.id]}}));if(!on){this.markSetup('community');this.toast('Welcome to '+g.name+'!','users-round');}}};});
     V.joinedCount=Object.values(s.joined).filter(Boolean).length;V.myPostCount=s.posts.filter(x=>x.author===V.me.name).length;V.editComProfile=()=>this.toast('Community profile editing comes next','pen-line');
@@ -4188,6 +4456,10 @@ class Component extends DCLogic {
     V.needOtp=!!s.needOtp;V.otp=s.otp||'';V.setOtp=v=>this.setState({otp:v,signErr:''});V.setKeep=e=>this.setState({keep:!!(e&&e.target&&e.target.checked)});
     V.T={matsEmpty:'Nothing matches that yet.',feedEmpty:'Nothing here yet. Be the first to post.',satSetup:'Tell us your test date, your latest score and your goal. David builds your practice around it, and every practice test you log updates this page.',satDiag:'No problem. David will send a 30-minute diagnostic test. Your score shows up here when you finish.',satAsk:'Ask David to cover it next lesson',quizWait:'Mia is answering',quizDone:'Mia got it right',wordPop:'Pops up on Mia’s screen with sound and 中文.',slides:'Golden Week story map',endTitle:'Nice work, Mia!',endSub:'You talked for 18 of 40 minutes. That’s your best yet.',feelNote:'Emma sees this. It helps her plan next week.',leaveTitle:'Leave Mia a note',leaveSub:'It lands on her home screen as a sticky note. Short and kind works best.'};
     V.weekEmptyMsg=V.notThisWeek;V.qs=V.qs.map(q=>({...q,showPlay:q.answered,hasAns:false}));V.qsEmpty=false;V.sharedEmpty=false;V.weeksEmpty=false;V.wordsEmpty=false;V.notesEmpty=false;V.mentorsEmpty=false;V.pastEmpty=false;V.studsEmptyPage=false;V.showStuds=true;V.isTutorRole=t;V.noClasses=false;V.hasClasses=false;V.lv={};
+    V.buyOpen=false;V.buy={packs:[],history:[]};V.openBuy=()=>this.toast('Opening plans on globallink.com','external-link');V.closeBuy=()=>{};V.buyWechat=()=>{};V.buyStripe=()=>{};
+    V.evFormOpen=false;V.evf={kinds:[],durs:[]};V.openEventForm=()=>{};V.closeEventForm=()=>{};V.canHostEvent=false;V.events=(V.events||[]).map(e=>({...e,hasLink:false}));
+    V.mv={has:false};V.T.matW='460px';V.T.recBg='url(assets/emma.png) center 25%/cover #0c1730';V.attachFile=()=>this.toast('Attachments work in real accounts.','paperclip');
+    V.tasksShown=(V.tasksShown||[]).map(k=>({...k,startRec:V.startTaskRec}));V.pr={nodes:[]};V.ap={kpis:[],pending:[],all:[],payouts:[]};V.aEvents=[];V.aEventsEmpty=true;
     V.signupHref=SITE_URL+'/#/start';V.forgotHref=SITE_URL+'/#/login';V.isDesktop=!!window.glDesktop;
     if(LIVE)this.liveVals(V);
     return V;

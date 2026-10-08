@@ -2,8 +2,13 @@
 // Every query is scoped to the caller; mentors only see students they are matched
 // with, students only see their own data. View-as (admin impersonation) tokens are
 // read-only. Full reference: API.md.
+import { teamMsg } from '../_lib/team.js';
 import { cors, body, str, int, fail, ipHash } from '../_lib/http.js';
-import { sql, hit, getConfig } from '../_lib/db.js';
+import { sql, hit, getConfig, addCredits } from '../_lib/db.js';
+import { notify, vapidPublicKey } from '../_lib/notify.js';
+import { packages, payInfo, createCheckout, settleCheckout } from '../_lib/payments.js';
+import { put } from '@vercel/blob';
+import { randomBytes } from 'node:crypto';
 import { session, meUser } from '../_lib/session.js';
 import { complete } from '../_lib/llm.js';
 import { inGrid } from '../_lib/time.js';
@@ -45,7 +50,7 @@ async function threadsFor(u, partners) {
     const mine = r.sender_id === u.id;
     const other = mine ? (r.recipient_id || 'team') : (r.sender_id || 'team');
     if (!byOther.has(other)) byOther.set(other, []);
-    byOther.get(other).push({ id: String(r.id), me: mine, t: r.body, at: ms(r.created_at), mats: r.mats || null, unread: !mine && !r.read_at });
+    byOther.get(other).push({ id: String(r.id), me: mine, t: r.body, at: ms(r.created_at), mats: r.mats || null, file: r.file || null, unread: !mine && !r.read_at, seen: mine && !!r.read_at });
   }
   const ids = [...new Set([...partners, ...[...byOther.keys()].filter(k => k !== 'team')])];
   const people = ids.length ? await sql`SELECT id, name, role FROM users WHERE id = ANY(${ids}::uuid[])` : [];
@@ -56,7 +61,12 @@ async function threadsFor(u, partners) {
 
 async function bootstrap(req, res, s) {
   const u = s.user;
-  const prof = await profile(u.id);
+  let prof = await profile(u.id);
+  // Every new student gets one free intro lesson credit, once.
+  if (u.role === 'student' && !prof.intro_granted && !s.readOnly) {
+    const [g] = await sql`UPDATE portal_profiles SET intro_granted = true WHERE user_id = ${u.id} AND NOT intro_granted RETURNING user_id`;
+    if (g) { await addCredits(u.id, 1, 'Free intro lesson', 'intro'); prof = await profile(u.id); }
+  }
   const [flags, maint, announce, reloadAt] = await Promise.all([getConfig('flags', DEFAULT_FLAGS), getConfig('maint', false), getConfig('announce', null), getConfig('reloadAt', 0)]);
   const matches = await matchesFor(u);
   const partners = matches.filter(m => m.status === 'active').map(m => (u.role === 'tutor' ? m.student_id : m.tutor_id));
@@ -73,7 +83,7 @@ async function bootstrap(req, res, s) {
   const questions = tutor
     ? await sql`SELECT q.*, s.name AS other_name FROM portal_questions q JOIN users s ON s.id = q.student_id WHERE q.tutor_id = ${u.id} ORDER BY q.created_at DESC LIMIT 200`
     : await sql`SELECT q.*, t.name AS other_name FROM portal_questions q JOIN users t ON t.id = q.tutor_id WHERE q.student_id = ${u.id} ORDER BY q.created_at DESC LIMIT 200`;
-  const sharedQs = await sql`SELECT q.id, q.body, q.kind, q.answer, s.name AS student_name, t.id AS tutor_id, t.name AS tutor_name FROM portal_questions q
+  const sharedQs = await sql`SELECT q.id, q.body, q.kind, q.answer, q.video_url, s.name AS student_name, t.id AS tutor_id, t.name AS tutor_name FROM portal_questions q
     JOIN users s ON s.id = q.student_id JOIN users t ON t.id = q.tutor_id
     WHERE q.shared AND q.answer IS NOT NULL ORDER BY q.answered_at DESC LIMIT 20`;
 
@@ -91,19 +101,28 @@ async function bootstrap(req, res, s) {
   // Bookable times: the availability grids of a student's active mentors.
   const grids = tutor || !partners.length ? [] : await sql`SELECT u.id, u.name, p.state->'avail' AS avail FROM users u LEFT JOIN portal_profiles p ON p.user_id = u.id WHERE u.id = ANY(${partners}::uuid[])`;
   const busy = tutor || !partners.length ? [] : await sql`SELECT tutor_id, start_at, dur_min FROM portal_lessons WHERE tutor_id = ANY(${partners}::uuid[]) AND status = 'scheduled' AND start_at > now()`;
+  const events = await sql`SELECT e.*, h.name AS host_name, (SELECT count(*)::int FROM portal_rsvps r WHERE r.event_id = e.id) AS going,
+      EXISTS (SELECT 1 FROM portal_rsvps r WHERE r.event_id = e.id AND r.user_id = ${u.id}) AS mine
+    FROM portal_events e LEFT JOIN users h ON h.id = e.host_id WHERE e.start_at > now() - interval '3 hours' ORDER BY e.start_at LIMIT 30`;
+  const payments = tutor ? [] : await sql`SELECT id, name, amount, credits, method, status, created_at FROM portal_payments WHERE user_id = ${u.id} ORDER BY created_at DESC LIMIT 20`;
   const directory = tutor ? [] : await sql`SELECT u.id, u.name, p.state->>'teaches' AS teaches FROM users u LEFT JOIN portal_profiles p ON p.user_id = u.id WHERE u.role = 'tutor' AND u.status = 'active' ORDER BY u.name LIMIT 100`;
 
   return res.status(200).json({
-    me: { ...meUser(u), credits: prof.credits },
+    me: { ...meUser(u), credits: prof.credits, packs: prof.packs || [] },
+    pkgs: (await packages()).filter(p => p.on),
+    payInfo: payInfo(),
+    vapid: vapidPublicKey(),
+    events: events.map(e => ({ id: String(e.id), title: e.title, kind: e.kind, body: e.body, start: ms(e.start_at), dur: e.dur_min, link: e.link || '', host: e.host_name || 'Global Link Team', hostId: e.host_id, going: e.going, mine: e.mine })),
+    payments: payments.map(p => ({ id: String(p.id), name: p.name, amount: p.amount, credits: p.credits, method: p.method, status: p.status, at: ms(p.created_at) })),
     readOnly: s.readOnly,
     state: prof.state || {},
     config: { flags: { ...DEFAULT_FLAGS, ...flags }, maint: !!maint, announce, reloadAt },
     matches: matches.map(m => ({ id: String(m.id), otherId: tutor ? m.student_id : m.tutor_id, name: m.other_name, subject: m.subject, status: m.status, since: ms(m.created_at), joined: ms(m.other_joined),
       profile: pick(m.other_state || {}, tutor ? ['goal', 'interests', 'grade', 'city'] : ['teaches', 'why', 'city']) })),
     lessons: lessons.map(l => ({ id: String(l.id), otherId: tutor ? l.student_id : l.tutor_id, name: l.other_name || 'Your mentor', start: ms(l.start_at), dur: l.dur_min, cls: l.cls, topic: l.topic, status: l.status, feedback: l.feedback })),
-    tasks: tasks.map(t => ({ id: String(t.id), title: t.title, kind: t.kind, cls: t.cls, due: t.due, done: t.done, mats: t.mats || [], sharedWith: t.shared_with || [], tutorId: t.tutor_id, tutorName: t.tutor_name || null, studentId: t.student_id, studentName: t.student_name || null, at: ms(t.created_at) })),
-    questions: questions.map(q => ({ id: String(q.id), otherId: tutor ? q.student_id : q.tutor_id, name: q.other_name, q: q.body, kind: q.kind, shared: q.shared, answer: q.answer, at: ms(q.created_at), answeredAt: ms(q.answered_at) })),
-    sharedQs: sharedQs.map(q => ({ id: 'sq' + q.id, from: first(q.student_name), tutorId: q.tutor_id, tutorName: q.tutor_name, q: q.body, kind: q.kind, ans: q.answer })),
+    tasks: tasks.map(t => ({ id: String(t.id), title: t.title, kind: t.kind, cls: t.cls, due: t.due, done: t.done, submission: t.submission || null, mats: t.mats || [], sharedWith: t.shared_with || [], tutorId: t.tutor_id, tutorName: t.tutor_name || null, studentId: t.student_id, studentName: t.student_name || null, at: ms(t.created_at) })),
+    questions: questions.map(q => ({ id: String(q.id), otherId: tutor ? q.student_id : q.tutor_id, name: q.other_name, q: q.body, kind: q.kind, shared: q.shared, answer: q.answer, video: q.video_url || null, expired: q.expired, at: ms(q.created_at), answeredAt: ms(q.answered_at) })),
+    sharedQs: sharedQs.map(q => ({ id: 'sq' + q.id, from: first(q.student_name), tutorId: q.tutor_id, tutorName: q.tutor_name, q: q.body, kind: q.kind, ans: q.answer, video: q.video_url || null })),
     assignments: assignments.map(a => ({ id: String(a.id), materialId: String(a.material_id), studentId: a.student_id, studentName: a.student_name, tutorName: a.tutor_name, due: a.due, note: a.note, progress: a.progress, opened: !!a.opened_at, at: ms(a.created_at),
       material: a.title ? { title: a.title, type: a.type, pack: a.pack, level: a.level, blocks: a.blocks } : null })),
     library: library.map(matOut),
@@ -118,6 +137,14 @@ async function bootstrap(req, res, s) {
   });
 }
 
+// Uploaded files must be in our Vercel Blob store.
+const BLOB_URL = new RegExp('^https://[a-z0-9]+\\.public\\.blob\\.vercel-storage\\.com/', 'i');
+export function cleanFile(f) {
+  if (!f || typeof f !== 'object') return null;
+  const url = str(f.url, 600);
+  if (!BLOB_URL.test(url)) return null;
+  return { url, name: str(f.name, 120) || 'file', type: str(f.type, 80) || 'application/octet-stream', size: int(f.size, 0, 50e6, 0), secs: int(f.secs, 0, 3600, 0) };
+}
 const pick = (o, keys) => Object.fromEntries(keys.filter(k => o[k] != null).map(k => [k, o[k]]));
 export const matOut = m => ({ id: String(m.id), title: m.title, type: m.type, pack: m.pack, level: m.level, blocks: m.blocks || [], status: m.status, uses: m.uses, ownerId: m.owner_id, by: m.owner_name || 'Global Link', at: ms(m.updated_at) });
 
@@ -160,7 +187,8 @@ async function sync(req, res, s) {
 
 async function message(req, res, s) {
   const u = s.user, b = body(req) || {};
-  const text = str(b.text, 4000);
+  const file = cleanFile(b.file);
+  const text = str(b.text, 4000) || (file ? (file.type.startsWith('audio/') ? 'Voice note' : file.name) : '');
   if (!text) return fail(res, 400, 'Write a message first.');
   if ((await hit('msg', u.id, 60)) > 30) return fail(res, 429, 'You’re sending messages quickly. Please wait a moment.');
   const to = b.to === 'team' ? null : String(b.to || '');
@@ -168,7 +196,8 @@ async function message(req, res, s) {
     if (!isUuid(to) || !(await partnerIds(u)).includes(to)) return fail(res, 403, 'You can message your mentors, your students and the Global Link team.');
   }
   const mats = Array.isArray(b.mats) ? b.mats.slice(0, 10).map(String) : null;
-  const [m] = await sql`INSERT INTO portal_messages (sender_id, recipient_id, body, mats) VALUES (${u.id}, ${to}, ${text}, ${mats ? JSON.stringify(mats) : null}::jsonb) RETURNING id, created_at`;
+  const [m] = await sql`INSERT INTO portal_messages (sender_id, recipient_id, body, mats, file) VALUES (${u.id}, ${to}, ${text}, ${mats ? JSON.stringify(mats) : null}::jsonb, ${file ? JSON.stringify(file) : null}::jsonb) RETURNING id, created_at`;
+  if (to) await notify(to, { kind: 'message', title: u.name, body: text, path: '/#/messages', email: true, emailSubject: 'New message from ' + u.name });
   // Messages to the team also land in the website's team inbox (GET /api/submissions?type=support_message).
   if (to === null) await sql`INSERT INTO submissions (type, data, email, user_id, ip_hash) VALUES ('support_message', ${JSON.stringify({ name: u.name, username: u.username, text })}::jsonb, ${u.email}, ${u.id}, ${ipHash(req)})`;
   return res.status(201).json({ id: String(m.id), at: ms(m.created_at) });
@@ -206,7 +235,7 @@ async function respond(req, res, s) {
   if (!m) return fail(res, 404, 'That request is no longer open.');
   if (m.request_id) await sql`UPDATE submissions SET status = ${b.accept ? 'matched' : 'new'} WHERE id = ${m.request_id}`;
   const note = b.accept ? `Great news! ${u.name} is now your mentor for ${m.subject || 'your lessons'}. You can message them and book a lesson.` : `Your mentor request is still open. We’re finding the right person for ${m.subject || 'you'}.`;
-  await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${m.student_id}, ${note})`;
+  await teamMsg(m.student_id, note, 'match', '/#/mentors');
   return res.status(200).json({ ok: true });
 }
 
@@ -224,8 +253,9 @@ async function book(req, res, s) {
   if (clash.length) return fail(res, 409, 'That time was just booked. Pick another.');
   const [m] = await sql`SELECT subject FROM portal_matches WHERE student_id = ${u.id} AND tutor_id = ${tutorId}`;
   const cls = str(b.cls, 80) || (m && m.subject ? m.subject.replace(/^\w/, c => c.toUpperCase()) : 'English Conversation');
-  const [l] = await sql`INSERT INTO portal_lessons (student_id, tutor_id, start_at, cls, topic) VALUES (${u.id}, ${tutorId}, ${iso}, ${cls}, ${str(b.topic, 200) || 'Open conversation'}) RETURNING *`;
-  await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${tutorId}, ${`${u.name} booked a lesson with you. It’s on your schedule.`})`;
+  if ((await addCredits(u.id, -1, 'Booked a lesson', iso)) === null) return fail(res, 402, 'You’re out of lesson credits. Buy more lessons first (most families pay us on WeChat).', { needCredits: true });
+  const [l] = await sql`INSERT INTO portal_lessons (student_id, tutor_id, start_at, cls, topic, credit_used) VALUES (${u.id}, ${tutorId}, ${iso}, ${cls}, ${str(b.topic, 200) || 'Open conversation'}, true) RETURNING *`;
+  await teamMsg(tutorId, `${u.name} booked a lesson with you. It’s on your schedule.`, 'lesson', '/#/schedule');
   return res.status(201).json({ id: String(l.id) });
 }
 
@@ -236,8 +266,10 @@ async function lesson(req, res, s) {
   if (b.op === 'cancel') {
     if (l.status !== 'scheduled') return fail(res, 409, 'This lesson can’t be cancelled.');
     await sql`UPDATE portal_lessons SET status = 'cancelled' WHERE id = ${id}`;
+    const early = new Date(l.start_at).getTime() - Date.now() > 24 * 3600000;
+    if (l.credit_used && (early || u.id === l.tutor_id)) await addCredits(l.student_id, 1, 'Lesson cancelled', 'lesson:' + l.id);
     const other = u.id === l.student_id ? l.tutor_id : l.student_id;
-    if (other) await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${other}, ${`${u.name} cancelled the lesson on ${new Date(l.start_at).toUTCString().slice(0, 22)} UTC.`})`;
+    if (other) await teamMsg(other, `${u.name} cancelled the lesson on ${new Date(l.start_at).toUTCString().slice(0, 22)} UTC.`, 'lesson', '/#/schedule');
     return res.status(200).json({ ok: true });
   }
   if (b.op === 'feedback' && u.id === l.tutor_id) {
@@ -266,6 +298,17 @@ async function task(req, res, s) {
     await sql`UPDATE portal_tasks SET done = ${!!b.done} WHERE id = ${id} AND student_id = ${u.id}`;
     return res.status(200).json({ ok: true });
   }
+  if (b.op === 'submit') {
+    const file = cleanFile(b.file);
+    if (!file) return fail(res, 400, 'Record or attach something first.');
+    const [t] = await sql`UPDATE portal_tasks SET done = true, submission = ${JSON.stringify(file)}::jsonb WHERE id = ${id} AND student_id = ${u.id} RETURNING tutor_id, title`;
+    if (!t) return fail(res, 404, 'Task not found.');
+    if (t.tutor_id) {
+      await sql`INSERT INTO portal_messages (sender_id, recipient_id, body, file) VALUES (${u.id}, ${t.tutor_id}, ${'For “' + t.title + '”'}, ${JSON.stringify(file)}::jsonb)`;
+      await notify(t.tutor_id, { kind: 'message', title: u.name, body: 'Sent: ' + t.title, path: '/#/messages' });
+    }
+    return res.status(200).json({ ok: true });
+  }
   if (b.op === 'delete') {
     await sql`DELETE FROM portal_tasks WHERE id = ${id} AND (student_id = ${u.id} AND tutor_id IS NULL OR tutor_id = ${u.id})`;
     return res.status(200).json({ ok: true });
@@ -282,16 +325,17 @@ async function ask(req, res, s) {
   const [t] = await sql`SELECT id FROM users WHERE id = ${isUuid(b.to) ? b.to : null} AND role = 'tutor' AND status = 'active'`;
   if (!t) return fail(res, 404, 'Pick a mentor.');
   const [r] = await sql`INSERT INTO portal_questions (student_id, tutor_id, body, kind, shared) VALUES (${u.id}, ${t.id}, ${q}, ${b.kind === 'video' ? 'video' : 'text'}, ${!!b.share}) RETURNING id`;
-  await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${t.id}, ${`${u.name} asked you a question: “${q.slice(0, 140)}”. Answer it in Questions.`})`;
+  await teamMsg(t.id, `${u.name} asked you a question: “${q.slice(0, 140)}”. Answer it in Questions.`, 'reply', '/#/questions');
   return res.status(201).json({ id: String(r.id) });
 }
 async function answer(req, res, s) {
   const u = s.user, b = body(req) || {};
-  const text = str(b.text, 4000);
+  const video = cleanFile(b.video);
+  const text = str(b.text, 4000) || (video ? 'Video reply' : '');
   if (text.length < 2) return fail(res, 400, 'Write your reply first.');
-  const [q] = await sql`UPDATE portal_questions SET answer = ${text}, answered_at = now() WHERE id = ${int(b.id, 0, 9e15, 0)} AND tutor_id = ${u.id} AND answer IS NULL RETURNING student_id, body`;
+  const [q] = await sql`UPDATE portal_questions SET answer = ${text}, video_url = ${video && video.type.startsWith('video/') ? video.url : null}, answered_at = now() WHERE id = ${int(b.id, 0, 9e15, 0)} AND tutor_id = ${u.id} AND answer IS NULL RETURNING student_id, body`;
   if (!q) return fail(res, 404, 'That question was already answered.');
-  await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${q.student_id}, ${`${u.name} answered your question “${q.body.slice(0, 100)}”. See it in Ask a mentor.`})`;
+  await teamMsg(q.student_id, `${u.name} answered your question “${q.body.slice(0, 100)}”. See it in Ask a mentor.`, 'reply', '/#/ask');
   return res.status(200).json({ ok: true });
 }
 
@@ -318,6 +362,7 @@ export function cleanMaterial(b) {
   const blocks = (Array.isArray(b.blocks) ? b.blocks : []).slice(0, 80).filter(x => x && KINDS.includes(x.k)).map(x => ({
     id: str(x.id, 40), k: x.k, text: str(x.text, 2000), zh: str(x.zh, 300), ex: str(x.ex, 500),
     opts: (Array.isArray(x.opts) ? x.opts : ['', '', '']).slice(0, 3).map(o => str(o, 300)), ok: int(x.ok, 0, 2, 0), sec: int(x.sec, 10, 600, 60),
+    ...(x.k === 'm' && cleanFile(x.file) ? { file: cleanFile(x.file) } : {}),
   }));
   return { title: str(b.title, 160), type: str(b.type, 40) || 'Lesson plan', pack: str(b.pack, 20) || 'free', level: str(b.level, 20) || 'Intermediate', blocks };
 }
@@ -440,6 +485,94 @@ async function translate(req, res, s) {
   }
 }
 
+// ---- uploads (Vercel Blob): voice notes, video replies, attachments, material files ----
+const APP_URL = () => (process.env.APP_URL || 'https://global-link-portal.vercel.app').replace(/\/$/, '');
+const UPLOAD_TYPES = /^(audio\/(webm|mp4|ogg|mpeg|wav|x-m4a|aac)|video\/(webm|mp4|quicktime)|image\/(png|jpeg|gif|webp)|application\/pdf|application\/msword|application\/vnd\.openxmlformats-officedocument\.[a-z.]+|application\/vnd\.ms-powerpoint|text\/plain)$/;
+async function rawBody(req) {
+  if (Buffer.isBuffer(req.body)) return req.body;
+  if (typeof req.body === 'string') return Buffer.from(req.body, 'latin1');
+  const chunks = []; for await (const c of req) chunks.push(Buffer.from(c)); return Buffer.concat(chunks);
+}
+async function upload(req, res, s) {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return fail(res, 503, 'Uploads aren’t set up yet.');
+  const type = String(req.query.type || '').split(';')[0].trim().toLowerCase();
+  if (!UPLOAD_TYPES.test(type)) return fail(res, 415, 'That kind of file isn’t supported.');
+  if ((await hit('upload', s.user.id, 3600)) > 40) return fail(res, 429, 'Too many uploads this hour. Try again later.');
+  const buf = await rawBody(req);
+  if (!buf.length) return fail(res, 400, 'The file is empty.');
+  if (buf.length > 4.2e6) return fail(res, 413, 'Files can be up to 4 MB.');
+  const name = (str(req.query.name, 100).replace(/[^\w.\- ]+/g, '_') || 'file').slice(0, 100);
+  const kind = ['voice', 'video', 'file', 'image', 'material'].includes(req.query.kind) ? req.query.kind : 'file';
+  const blob = await put('u/' + s.user.id + '/' + kind + '/' + randomBytes(9).toString('base64url') + '-' + name, buf, { access: 'public', contentType: type, token: process.env.BLOB_READ_WRITE_TOKEN });
+  return res.status(201).json({ url: blob.url, name, type, size: buf.length, secs: int(req.query.secs, 0, 3600, 0) });
+}
+
+// ---- push notifications ----
+async function pushSubscribe(req, res, s) {
+  const b = body(req) || {}, k = b.keys || {};
+  const endpoint = str(b.endpoint, 1000);
+  if (!/^https:\/\//.test(endpoint) || !k.p256dh || !k.auth) return fail(res, 400, 'That notification subscription isn’t valid.');
+  await sql`INSERT INTO portal_push (user_id, endpoint, p256dh, auth) VALUES (${s.user.id}, ${endpoint}, ${str(k.p256dh, 200)}, ${str(k.auth, 100)})
+    ON CONFLICT (endpoint) DO UPDATE SET user_id = EXCLUDED.user_id, p256dh = EXCLUDED.p256dh, auth = EXCLUDED.auth`;
+  return res.status(200).json({ ok: true });
+}
+async function pushUnsubscribe(req, res, s) {
+  const b = body(req) || {};
+  await sql`DELETE FROM portal_push WHERE endpoint = ${str(b.endpoint, 1000)} AND user_id = ${s.user.id}`;
+  return res.status(200).json({ ok: true });
+}
+
+// ---- buying lessons ----
+// Most families pay Global Link on WeChat: the app records a request, tells the
+// team, and the team marks it paid in Admin -> Payments (which adds credits).
+// Stripe Checkout (card / Alipay / WeChat Pay) is offered when it's configured.
+async function buy(req, res, s) {
+  const u = s.user, b = body(req) || {};
+  if (u.role !== 'student') return fail(res, 403, 'Lesson packs are for student accounts.');
+  const pk = (await packages()).find(p => p.on && p.id === b.packId);
+  if (!pk) return fail(res, 404, 'That plan isn’t available.');
+  if (Number(pk.price) <= 0) return fail(res, 400, 'Your free intro lesson is already in your account.');
+  if ((await hit('buy', u.id, 3600)) > 10) return fail(res, 429, 'Too many attempts. Please try again later.');
+  if (b.method === 'stripe') {
+    if (!process.env.STRIPE_SECRET_KEY) return fail(res, 503, 'Paying by card in the app isn’t switched on yet. Please pay on WeChat.');
+    return res.status(200).json({ url: await createCheckout({ user: u, pack: pk, appUrl: APP_URL() }) });
+  }
+  const [p] = await sql`INSERT INTO portal_payments (user_id, pack_id, name, amount, credits, method, status) VALUES (${u.id}, ${pk.id}, ${pk.name}, ${Number(pk.price)}, ${pk.credits}, 'wechat', 'pending') RETURNING id`;
+  const text = 'I’d like to buy ' + pk.name + ' (¥' + pk.price + '). Payment request #' + p.id + '.';
+  await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (${u.id}, NULL, ${text})`;
+  await sql`INSERT INTO submissions (type, data, email, user_id, ip_hash) VALUES ('payment_request', ${JSON.stringify({ name: u.name, username: u.username, pack: pk.name, price: pk.price, paymentId: p.id })}::jsonb, ${u.email}, ${u.id}, ${ipHash(req)})`;
+  const id = payInfo().wechatId;
+  await teamMsg(u.id, 'Thanks! To pay for ' + pk.name + ' (¥' + pk.price + '), send it to us on WeChat' + (id ? ' (WeChat ID: ' + id + ')' : '') + ' and mention request #' + p.id + '. We add your ' + pk.credits + ' lesson credits as soon as it arrives, usually within a day.');
+  return res.status(201).json({ id: String(p.id), wechatId: id });
+}
+async function checkoutStatus(req, res) {
+  const r = await settleCheckout(str((body(req) || {}).sessionId, 200));
+  return res.status(200).json(r || { paid: false });
+}
+
+// ---- community events ----
+async function rsvp(req, res, s) {
+  const b = body(req) || {}, id = int(b.id, 0, 9e15, 0);
+  if (b.on) await sql`INSERT INTO portal_rsvps (event_id, user_id) SELECT id, ${s.user.id} FROM portal_events WHERE id = ${id} ON CONFLICT DO NOTHING`;
+  else await sql`DELETE FROM portal_rsvps WHERE event_id = ${id} AND user_id = ${s.user.id}`;
+  return res.status(200).json({ ok: true });
+}
+export function cleanEvent(b) {
+  const title = str(b.title, 140), start = int(b.start, 0, 9e15, 0);
+  if (title.length < 4) return { error: 'Give the event a title.' };
+  if (start < Date.now() || start > Date.now() + 180 * 86400000) return { error: 'Pick a time in the next six months.' };
+  const link = str(b.link, 300);
+  if (link && !/^https:\/\//.test(link)) return { error: 'The link must start with https://' };
+  return { title, start, kind: ['Live Q&A', 'Workshop', 'Club', 'Social'].includes(b.kind) ? b.kind : 'Live Q&A', body: str(b.body, 1000), dur: int(b.dur, 15, 240, 45), link };
+}
+async function event(req, res, s) {
+  if (s.user.role !== 'tutor') return fail(res, 403, 'Mentors and the Global Link team host events.');
+  const e = cleanEvent(body(req) || {});
+  if (e.error) return fail(res, 400, e.error);
+  const [r] = await sql`INSERT INTO portal_events (host_id, title, kind, body, start_at, dur_min, link) VALUES (${s.user.id}, ${e.title}, ${e.kind}, ${e.body}, ${new Date(e.start).toISOString()}, ${e.dur}, ${e.link || null}) RETURNING id`;
+  return res.status(201).json({ id: String(r.id) });
+}
+
 const W = true; // route performs writes (blocked for read-only view-as sessions)
 const ROUTES = {
   bootstrap: ['GET', bootstrap], sync: ['GET', sync],
@@ -450,6 +583,8 @@ const ROUTES = {
   material: ['POST', material, W], assign: ['POST', assign, W], unassign: ['POST', unassign, W], progress: ['POST', progress, W],
   post: ['POST', post, W], comment: ['POST', comment, W], like: ['POST', like, W], report: ['POST', report, W],
   lumi: ['POST', lumi, W], translate: ['POST', translate],
+  upload: ['POST', upload, W], 'push-subscribe': ['POST', pushSubscribe, W], 'push-unsubscribe': ['POST', pushUnsubscribe, W],
+  buy: ['POST', buy, W], 'checkout-status': ['POST', checkoutStatus, W], rsvp: ['POST', rsvp, W], event: ['POST', event, W],
 };
 
 export default async function handler(req, res) {

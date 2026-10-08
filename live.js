@@ -196,7 +196,8 @@
     D.TASKS = B.tasks.map(function (t) {
       var share = (t.sharedWith || []).filter(function (id) { return people[id]; });
       return { id: 't' + t.id, taskId: t.id, title: t.title, cls: tutor ? (t.studentName || t.cls) : t.cls, m: tutor ? null : (t.tutorId || null), mine: !t.tutorId, shareTo: share, shareLabel: share.map(function (id) { return people[id].first; }).join(', '),
-        due: t.due || 'No due date', due2: '', kind: t.kind, icon: KIND_ICON[t.kind] || ctx.TI[t.kind] || 'square-check-big', done: t.done, mats: (t.mats || []).map(String), student: t.studentName };
+        due: t.done && t.submission ? 'Sent' : (t.due || 'No due date'), due2: '', kind: t.kind, icon: KIND_ICON[t.kind] || ctx.TI[t.kind] || 'square-check-big', done: t.done, mats: (t.mats || []).map(String), student: t.studentName,
+        rec: !tutor && !!t.tutorId && /voice/i.test(t.kind), submission: t.submission };
     });
 
     // Materials (assignments for students).
@@ -225,7 +226,8 @@
     var TH = B.threads.map(function (t) {
       var who = t.id === 'team' ? null : people[t.id] || person(t.id, t.name);
       var match = B.matches.filter(function (m) { return m.otherId === t.id; })[0];
-      var msgs = t.msgs.map(function (m) { return { id: m.id, me: m.me, t: m.t, time: msgTime(m.at, tz, now), at: m.at, mats: m.mats || undefined }; });
+      var msgs = t.msgs.map(function (m) { var fl = m.file; return { id: m.id, me: m.me, t: m.t, time: msgTime(m.at, tz, now) + (m.seen ? ' · Seen' : ''), at: m.at, mats: m.mats || undefined,
+        file: fl || null, hasFile: !!fl, isAudio: !!(fl && /^audio\//.test(fl.type)), isImage: !!(fl && /^image\//.test(fl.type)), isVideo: !!(fl && /^video\//.test(fl.type)), isDoc: !!(fl && !/^(audio|image|video)\//.test(fl.type)), fileUrl: fl ? fl.url : '', fileName: fl ? fl.name : '' }; });
       if (t.id === 'team' && !msgs.length) msgs = [{ me: false, t: 'Welcome to Global Link, ' + first(me.name) + '! Message us here any time about your account, plans or lessons.', time: msgTime(Date.parse(me.createdAt) || now, tz, now), at: 0 }];
       return { id: t.id, name: t.name, photo: t.id === 'team' ? 'assets/gl-mark.png' : '', sub: t.id === 'team' ? (tutor ? 'Mentor support' : 'Account and bookings') : (match ? cap(match.subject) : (t.role === 'tutor' ? 'Mentor' : 'Student')),
         local: t.id === 'team' ? '' : dayName(now, oz) + ' ' + clock(now, oz) + ' in ' + otherCity, reply: t.id === 'team' ? 'We reply within a day' : '', unread: t.msgs.filter(function (m) { return m.unread; }).length, msgs: msgs, canSend: t.partner, last: msgs.length ? msgs[msgs.length - 1].at : 0 };
@@ -244,11 +246,11 @@
       D.QS = B.questions.map(function (q) {
         person(q.otherId, q.name);
         var due = q.at + 72 * 3600000;
-        return { id: 'q' + q.id, to: q.otherId, q: q.q, type: q.kind === 'video' ? 'Video reply' : 'Text reply', answered: !!q.answer, ans: q.answer || '', len: 'Text', by: dayName(due, BJ) + ' ' + clock(due, BJ), by2: dayName(due, CA) + ' ' + clock(due, CA) + ' in California', pct: Math.min(1, (now - q.at) / (72 * 3600000)), asked: 'Asked ' + ago(q.at, now) };
+        return { id: 'q' + q.id, to: q.otherId, q: q.q, type: q.kind === 'video' ? 'Video reply' : 'Text reply', answered: !!q.answer, ans: q.answer || '', video: q.video || '', expired: !!q.expired, len: q.video ? 'Video' : 'Text', by: dayName(due, BJ) + ' ' + clock(due, BJ), by2: dayName(due, CA) + ' ' + clock(due, CA) + ' in California', pct: Math.min(1, (now - q.at) / (72 * 3600000)), asked: 'Asked ' + ago(q.at, now) };
       });
       D.TQ = [];
     }
-    D.SHARED = (B.sharedQs || []).map(function (q) { person(q.tutorId, q.tutorName); return { id: q.id, from: q.from, to: q.tutorId, q: q.q, type: q.kind === 'video' ? 'Video reply' : 'Text reply', ans: q.ans, len: '' }; });
+    D.SHARED = (B.sharedQs || []).map(function (q) { person(q.tutorId, q.tutorName); return { id: q.id, from: q.from, to: q.tutorId, q: q.q, type: q.video ? 'Video reply' : 'Text reply', ans: q.ans, video: q.video || '', len: q.video ? 'Video' : '' }; });
 
     // Notifications derived from recent activity.
     var N = [];
@@ -280,7 +282,14 @@
     });
     D.GROUPS = ctx.GROUPS.map(function (g) { return Object.assign({}, g, { members: (B.groupCounts || {})[g.id] || 0 }); });
     D.MEMBERS = B.members || 0;
-    D.EVENTS = [];
+    D.EVENTS = (B.events || []).map(function (e) {
+      var hid = 'host-' + e.id; people[hid] = { id: hid, name: e.host, first: first(e.host), photo: e.hostId ? '' : 'assets/gl-mark.png', note: 'blue' };
+      var p = parts(e.start, tz);
+      return { id: e.id, title: e.title, host: hid, m: MON[p.mo - 1].toUpperCase(), d: String(p.d), bj: dayName(e.start, BJ) + ' ' + clock(e.start, BJ) + ' Beijing', ca: dayName(e.start, CA) + ' ' + clock(e.start, CA) + ' California',
+        going: Math.max(0, e.going - (e.mine ? 1 : 0)), kind: e.kind, body: e.body, link: e.link, start: e.start, mineRsvp: e.mine };
+    });
+    D.rsvp = {}; D.EVENTS.forEach(function (e) { if (e.mineRsvp) D.rsvp[e.id] = true; });
+    D.credits = B.me.credits || 0; D.packs = B.me.packs || []; D.pkgs = B.pkgs || []; D.payInfo = B.payInfo || {}; D.payments = B.payments || [];
 
     D.MENTORS = people;
     D.TZD = tzGap(now);
@@ -335,7 +344,16 @@
     return D;
   }
 
-  window.GLLive = { api: api, getToken: getToken, setToken: setToken, clearToken: clearToken, setViewToken: function (t) { viewToken = t; },
+  // Uploads a recording or file (max 4 MB) to the app's Blob store; resolves { url, name, type, size }.
+  function upload(blob, o) {
+    o = o || {};
+    var type = (o.type || blob.type || 'application/octet-stream').split(';')[0];
+    var q = new URLSearchParams({ kind: o.kind || 'file', name: o.name || 'file', type: type, secs: String(o.secs || 0) });
+    var t = getToken();
+    return fetch('/api/portal/upload?' + q, { method: 'POST', headers: Object.assign({ 'content-type': 'application/octet-stream' }, t ? { authorization: 'Bearer ' + t } : {}), body: blob })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var e = new Error(j.error || 'Upload failed'); e.status = r.status; throw e; } return j; }); });
+  }
+  window.GLLive = { api: api, upload: upload, getToken: getToken, setToken: setToken, clearToken: clearToken, setViewToken: function (t) { viewToken = t; },
     mapMember: mapMember, mapAdmin: mapAdmin, parts: parts, zoned: zoned, clock: clock, ago: ago, tzGap: tzGap, BJ: BJ, CA: CA, first: first,
     greeting: function (tz) { var h = parts(Date.now(), tz).h; return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; } };
 })();

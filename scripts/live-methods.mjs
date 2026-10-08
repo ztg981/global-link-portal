@@ -26,17 +26,17 @@ function setLive(L){LIVE=L;const D=L.D;TZD=D.TZD||15;
 export const METHODS = String.raw`
   // ---------- live accounts (API) ----------
   sync(path,body,quiet){if(!LIVE)return Promise.resolve(null);if(LIVE.readOnly){this.toast('You’re viewing this account read-only.','eye');return Promise.resolve(null);}
-    return GLLive.api(path,body).then(r=>{this.refreshSoon();return r||{};}).catch(e=>{this.toast(e.message||'Something went wrong. Please try again.','circle-alert');if(e.status===401)this.signOut();return null;});}
+    return GLLive.api(path,body).then(r=>{this.refreshSoon();return r||{};}).catch(e=>{this.toast(e.message||'Something went wrong. Please try again.','circle-alert');if(e.status===401)this.signOut();if(e.status===402)this.openBuy();return null;});}
   refreshSoon(){clearTimeout(this._rf);this._rf=setTimeout(()=>this.refresh(),350);}
   refresh(){if(!LIVE)return Promise.resolve();
     if(LIVE.kind==='admin')return GLLive.api('admin/data').then(A=>this.applyAdmin(A,false)).catch(e=>{if(e.status===401)this.signOut();});
     return GLLive.api('portal/bootstrap').then(B=>this.loadLive(B,false)).catch(e=>{if(e.status===401&&!LIVE.readOnly)this.signOut();});}
-  resume(){const tok=GLLive.getToken();if(!tok){this.setState({stage:'signin'});return;}
+  resume(){if(this.handleAuthHash())return;const tok=GLLive.getToken();if(!tok){this.setState({stage:'signin'});return;}
     this.setState({stage:'sync',syncStep:0,signing:true,resuming:true});
     GLLive.api('auth/me').then(r=>this.startLive(r.user)).catch(e=>{if(e.status===401)GLLive.clearToken();this.setState({stage:'signin',signing:false,resuming:false,signErr:e.status===401?'':'We couldn’t reach Global Link. Check your connection, then sign in.'});});}
   startLive(user){
     if(user.role==='admin')return GLLive.api('admin/data').then(A=>{this.applyAdmin(A,true,user);this.startSync('admin');}).catch(e=>this.liveFail(e));
-    return GLLive.api('portal/bootstrap').then(B=>{this.loadLive(B,true);this.startSync(B.me.role==='tutor'?'tutor':'student');}).catch(e=>this.liveFail(e));}
+    return GLLive.api('portal/bootstrap').then(B=>{this.loadLive(B,true);this.startSync(B.me.role==='tutor'?'tutor':'student');this.handlePaidReturn();this.ensurePush();}).catch(e=>this.liveFail(e));}
   liveFail(e){if(e&&e.status===401)GLLive.clearToken();setDemo();this.setState({stage:'signin',signing:false,signErr:(e&&e.message)||'Couldn’t load your account. Please try again.'});}
   loadLive(B,initial){const prevUnread=LIVE&&LIVE.D&&LIVE.D.TH?LIVE.D.TH.reduce((a,x)=>a+x.unread,0):null;
     const D=GLLive.mapMember(B,{TI,PACKS,GROUPS:DEMO_SNAP.GROUPS});setLive({kind:'member',me:B.me,B,D,readOnly:!!B.readOnly});
@@ -59,7 +59,7 @@ export const METHODS = String.raw`
   applyAdmin(A,initial,user){const me=user||(LIVE&&LIVE.me)||{name:'Jordan Reyes'};const D=GLLive.mapAdmin(A,{GROUPS:DEMO_SNAP.GROUPS});setLive({kind:'admin',me,A,D});
     const p={users:USERS.map(u=>({...u})),audit:AUDIT0.slice(),mq:MQ0.slice(),aLes:LESSONS_A.map(l=>l.slice()),txns:[],pkgs:PKG0.map(x=>({...x})),modQ:MOD0.slice(),modRules:D.modRules,annHist:D.annHist,announce:D.announce,flags:D.flags,maint:D.maint,myMats:D.MYMATS,aLib:D.ALIB,payDone:false};
     if(initial){p.aNotes=D.notes;p.asAdmin=false;Object.assign(p,{sessions:[],tasks:[],thS:[],thT:[],qs:[],tq:[],reqs:[],tReqs:[],posts:[],tAssigned:[],matProg:{},liked:{},ntTo:{}});}this.setState(p);}
-  signOut(){clearTimeout(this._saveT);GLLive.clearToken();setDemo();this.setState({...this.demoReset(),stage:'signin',meOpen:false,meTop:false,call:null,asAdmin:false,email:'',pw:'',otp:'',needOtp:false,signing:false,signErr:'',lumiOpen:false,palette:false,notifOpen:false,aUser:null,tourStep:null});}
+  signOut(){clearTimeout(this._saveT);this.recReset(true);if(LIVE&&LIVE.kind==='member'&&!LIVE.readOnly)this.dropPush(GLLive.getToken());GLLive.clearToken();setDemo();this.setState({...this.demoReset(),stage:'signin',meOpen:false,meTop:false,call:null,asAdmin:false,email:'',pw:'',otp:'',needOtp:false,signing:false,signErr:'',lumiOpen:false,palette:false,notifOpen:false,aUser:null,tourStep:null});}
   demoReset(){const I=this._init0||{};const o={};['sessions','tasks','thS','thT','qs','tq','reqs','tReqs','posts','users','audit','mq','aLes','txns','pkgs','modQ','annHist','myMats','tAssigned','matProg','satAns','sat','savedWords','liked','savedP','joined','rsvp','lumiMsgs','avail','flags','maint','announce','modRules','pinned','activeS','activeT','selStudent','selClass','replyFor','askTo','aNotes','count','displayName','pastReq'].forEach(k=>{o[k]=I[k];});o.aLib=null;return o;}
   enterDemo(role,fresh){setDemo();this.setState({...this.demoReset(),asAdmin:true,stage:'signin',call:null,meOpen:false,meTop:false,aUser:null});this.later(()=>{this.setState({email:role==='tutor'?'emma.carter@example.com':'mia.lin@example.com'});this.startSync(role,fresh);},30);}
   viewAs(au){if(au.role==='Parent'){this.toast('Parents don’t have a portal view yet.','info');return;}
@@ -98,7 +98,7 @@ export const METHODS = String.raw`
     return on?'You have '+on+' mentor'+(on===1?'':'s')+' ready to teach you!':open?'We’re finding your mentor now. It usually takes a day or two.':'No mentor requests yet. You can ask for one from My mentors.';}
   liveVals(V){const s=this.state,t=this.isT(),L=LIVE,admin=L.kind==='admin';V.LIVE=true;V.DEMO=false;V.readOnly=!!L.readOnly;
     V.siteUrl=SITE_URL;V.appVersion=APP_VERSION;
-    if(admin){this.adminLiveVals(V);return;}
+    if(admin){this.adminLiveVals(V);this.liveVals2(V);return;}
     const D=L.D,me=L.me,nx=(s.sessions||[]).find(x=>x.next);const peerId=nx?(t?nx.who:nx.m):null;const peer=peerId?(STUDENTS[peerId]||MENTORS[peerId]||{name:'',first:''}):null;
     const nv=nx?this.viewSessLive(nx):null;
     V.lv={hasNext:!!nx,noNext:!nx,nextUpper:nv?('NEXT LESSON · '+nv.rel.toUpperCase()):'',nextCls:nv?nv.cls:'',nextTopic:nv?nv.topic:'',peerName:peer?peer.name:'',peerFirst:peer?(peer.first||GLLive.first(peer.name)):'',
@@ -137,20 +137,21 @@ export const METHODS = String.raw`
     V.T={...V.T,matsEmpty:V.matsEmptyMsg,feedEmpty:V.feedEmptyMsg,satSetup:'Tell us your test date, your latest score and your goal. Your mentor builds your practice around it, and every practice test you log updates this page.',satDiag:'No problem. Start with a full practice test from College Board’s Bluebook app, then log your score here.',satAsk:'Ask your mentor to cover it next lesson',quizWait:pf+' is answering',quizDone:pf+' got it right',wordPop:'Pops up on '+pf+'’s screen with sound and 中文.',slides:'Your slides',endTitle:V.endTitle,endSub:'Thanks for joining. Your mentor’s notes will show up on your home screen.',feelNote:'Your mentor sees this. It helps them plan the next lesson.',leaveTitle:V.endTitle,leaveSub:'It lands on their home screen as a sticky note. Short and kind works best.'};
     V.qs=V.qs.map(q=>({...q,showPlay:false,hasAns:!!q.ans}));V.showStuds=!V.studsEmpty||!t;V.studsEmptyPage=t&&V.studsEmpty;V.isTutorRole=t;
     V.devSims=[];V.devAccounts=[];V.aPayouts=[];V.cap=['','',''];
-    V.clItems=V.clItems.map(x=>x.k==='hello'?{...x,t:t?'Say hi to your students':'Say hi to your mentor'}:x.k==='mentors'&&t?{...x,s:'Accept students Global Link sends you'}:x);}
+    V.clItems=V.clItems.map(x=>x.k==='hello'?{...x,t:t?'Say hi to your students':'Say hi to your mentor'}:x.k==='mentors'&&t?{...x,s:'Accept students Global Link sends you'}:x);
+    this.liveVals2(V);}
   adminLiveVals(V){const s=this.state,D=LIVE.D,U=s.users||[];V.clockA=D.clockA;V.clockB=D.clockB;V.me={name:LIVE.me.name||'Admin',photo:'',sub:'Admin · Global Link'};
     const live=(s.aLes||[]).filter(l=>l[5]==='Live');const today=(s.aLes||[]).filter(l=>!/^(Mon|Tue|Wed|Thu|Fri|Sat|Sun|Tomorrow|Yesterday)/.test(l[0]));
     V.aLive=live.map(l=>({who:l[2]+' with '+l[3],cls:l[4]}));V.aHasLive=live.length>0;V.aNoLive=!live.length;
     const k=V.aKpis;const set=(i,v,sub)=>{if(k[i]){k[i].v=v;k[i].sub=sub;}};const stu=U.filter(u=>u.role==='Student'),men=U.filter(u=>u.role==='Mentor');const newToday=((D.signups||[])[(D.signups||[]).length-1]||{}).v||0;
     set(0,stu.length,newToday?newToday+' joined today':'No new sign-ups today');set(1,men.filter(u=>u.status==='Active').length+' active',men.filter(u=>u.status!=='Active').length+' paused');set(2,today.length,live.length?live.length+' live now':'None live right now');
-    set(3,'¥0','Payments not built yet');set(4,(s.mq||[]).length,(s.mq||[]).length?'oldest '+s.mq[0].wait:'All caught up');set(5,(s.modQ||[]).length,'from the community');
+    const A0=LIVE.A||{},mo=new Date().toISOString().slice(0,7),rev=(A0.payments||[]).filter(p=>p.status==='paid'&&new Date(p.paidAt||p.at).toISOString().slice(0,7)===mo).reduce((a,p)=>a+p.amount,0),pend=(A0.payments||[]).filter(p=>p.status==='pending').length;set(3,'¥'+rev.toLocaleString(),pend?pend+' waiting for payment':'This month');set(4,(s.mq||[]).length,(s.mq||[]).length?'oldest '+s.mq[0].wait:'All caught up');set(5,(s.modQ||[]).length,'from the community');
     const go=pg=>()=>this.go(pg);V.aTodos=[].concat((s.mq||[]).length?[{t:(s.mq||[]).length+' student'+((s.mq||[]).length===1?'':'s')+' waiting for a mentor',s:'Oldest: '+s.mq[0].name+', '+s.mq[0].wait,icon:'git-merge',bg:'rgba(240,170,40,.16)',fg:'#c98a12',go:go('a_matching')}]:[],
       (s.modQ||[]).length?[{t:(s.modQ||[]).length+' community report'+((s.modQ||[]).length===1?'':'s'),s:'Review and decide',icon:'shield-alert',bg:'rgba(229,72,77,.12)',fg:'var(--gl-danger)',go:go('a_moderation')}]:[],
       (D.support||[]).length?[{t:D.support.length+' message'+(D.support.length===1?'':'s')+' to the team',s:'From '+D.support[0].name,icon:'message-circle',bg:'var(--gl-tint)',fg:'var(--gl-blue)',go:go('a_people')}]:[]);
     V.aTodoN=V.aTodos.length;V.aTodoEmpty=!V.aTodos.length;
     V.notifs=V.aTodos.map((x,i)=>({id:'an'+i,icon:x.icon,t:x.t,s:x.s,time:'',dot:!s.notifRead}));if(!V.notifs.length)V.notifs=[{id:'an0',icon:'circle-check',t:'All caught up',s:'Nothing needs you right now',time:'',dot:false}];V.hasUnreadNotif=V.aTodos.length>0&&!s.notifRead;
-    V.aPayouts=[];V.aPayEmpty=true;V.aApprovePay=()=>this.toast('Payouts arrive with the payments system.','wallet');V.aPayPending=false;V.aTxnsEmpty=true;
-    V.aInteg=[['Accounts shared with globallink.com','Working','var(--gl-success)'],['Lumi (Gemini, then OpenRouter)','Working','var(--gl-success)'],['Google sign-in','Not set up','var(--gl-faint)'],['WeChat sign-in and Pay','Not built yet','var(--gl-faint)'],['Video lessons','Preview only','#d99a00']].map(([l,st,dot])=>({l,s:st,dot}));
+    V.aPayouts=[];V.aPayEmpty=true;V.aApprovePay=()=>this.go('a_payments');V.aPayPending=false;V.aTxnsEmpty=true;
+    V.aInteg=[['Accounts shared with globallink.com','Working','var(--gl-success)'],['Lumi (Gemini, then OpenRouter)','Working','var(--gl-success)'],['Google sign-in',A0.google?'Working':'Not set up',A0.google?'var(--gl-success)':'var(--gl-faint)'],['Card payments (Stripe)',A0.stripe?'Working':'Not set up',A0.stripe?'var(--gl-success)':'var(--gl-faint)'],['Email (Resend)',A0.email?'Working':'Not set up',A0.email?'var(--gl-success)':'var(--gl-faint)'],['Push notifications',A0.push?'Working':'Not set up',A0.push?'var(--gl-success)':'var(--gl-faint)'],['WeChat payments','Confirmed by the team','var(--gl-success)'],['Video lessons','Preview only','#d99a00']].map(([l,st,dot])=>({l,s:st,dot}));
     V.aVers=[['Windows','monitor',APP_VERSION,'Updates automatically'],['macOS','laptop',APP_VERSION,'Updates automatically'],['Web','globe',APP_VERSION,'Always latest']].map(([l,icon,ver,on])=>({l,icon,ver,on,btn:l==='Web'?'Reload all':'Force update',force:()=>{this.sync('admin/config',{key:'reloadAt',value:Date.now(),audit:l==='Web'?'Reloaded all web sessions':'Asked '+l+' apps to check for updates',icon:'refresh-cw'});this.toast(l==='Web'?'Open portals refresh within a minute':l+' apps check for updates within a minute','refresh-cw');}}));
     V.devSims=V.devSims.filter((_,i)=>i===3);V.aSupport=(D.support||[]).map(x=>({...x,when:GLLive.ago(x.at),open:()=>{const u=(s.users||[]).find(y=>y.id===x.userId);if(u)this.setState({aUser:u.id,aMsgOpen:true,aMsgText:''});}}));V.aHasSupport=V.aSupport.length>0;
     const au=U.find(u=>u.id===s.aUser);V.aMsgOpen=!!s.aMsgOpen&&!!au;V.aMsgText=s.aMsgText||'';V.setAMsgText=v=>this.setState({aMsgText:v});V.aMsgThread=(s.aThread||[]).map(m=>({...m,them:!m.me,align:m.me?'end':'start'}));

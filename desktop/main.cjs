@@ -23,6 +23,21 @@ app.setName('Global Link');
 if (process.platform === 'win32') app.setAppUserModelId('com.globallink.portal');
 if (!app.requestSingleInstanceLock()) app.quit();
 
+// Google sign-in finishes in the user's browser, which hands a one-time code back
+// through a globallink://oauth/<code> link. Only that exact shape is accepted.
+const PROTOCOL = 'globallink';
+if (process.defaultApp && process.argv.length >= 2) app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, [path.resolve(process.argv[1])]);
+else app.setAsDefaultProtocolClient(PROTOCOL);
+const OAUTH_LINK = /^globallink:\/\/oauth\/([A-Za-z0-9_-]{20,200})\/?$/;
+let pendingLink = process.argv.find(a => a.startsWith(PROTOCOL + '://')) || null;
+function openLink(link) {
+  const m = OAUTH_LINK.exec(String(link || ''));
+  if (!m) return;
+  if (!win || win.isDestroyed()) { pendingLink = link; return createWindow(); }
+  offline = false; win.loadURL(APP_URL + '/?app=desktop#/oauth/' + m[1]); show();
+}
+app.on('open-url', (e, link) => { e.preventDefault(); if (app.isReady()) openLink(link); else pendingLink = link; });
+
 let win = null, tray = null, quitting = false, keepInTray = false, offline = false;
 const startHidden = process.argv.includes('--hidden');
 
@@ -70,7 +85,11 @@ function createWindow() {
     quitting = true; app.quit();
   }, Number(process.env.GL_SMOKE_WAIT || 7000)));
 }
-function load() { offline = false; win.loadURL(APP_URL + '/?app=desktop'); }
+function load() {
+  offline = false;
+  if (pendingLink) { const l = pendingLink; pendingLink = null; const m = OAUTH_LINK.exec(l); if (m) return win.loadURL(APP_URL + '/?app=desktop#/oauth/' + m[1]); }
+  win.loadURL(APP_URL + '/?app=desktop');
+}
 function sameOrigin(url) { try { return new URL(url).origin === APP_ORIGIN; } catch { return false; } }
 function openOutside(url) { if (/^https?:\/\//.test(url)) shell.openExternal(url); }
 
@@ -157,7 +176,7 @@ app.whenReady().then(() => {
 
   app.on('activate', show);
 });
-app.on('second-instance', show);
+app.on('second-instance', (_e, argv) => { const link = (argv || []).find(a => a.startsWith(PROTOCOL + '://')); if (link) openLink(link); else show(); });
 app.on('before-quit', () => { quitting = true; });
 app.on('window-all-closed', () => { if (!isMac) app.quit(); });
 nativeTheme.themeSource = 'system';

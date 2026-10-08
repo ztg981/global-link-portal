@@ -49,6 +49,7 @@ const VARIANTS = [
   {}, { bookOpen: true }, { askOpen: true }, { reqOpen: true }, { postOpen: true }, { ntOpen: true }, { palette: true }, { notifOpen: true }, { meTop: true }, { clOpen: true },
   { prTab: 'sat' }, { prTab: 'act' }, { mTab: 'past' }, { comTab: 'events' }, { comTab: 'groups' }, { libTab: 'asg' }, { matTab: 'asg' }, { matTab: 'prog' }, { recapFull: true }, { tFilter: 'all' },
   { recapTab: 'transcript' }, { recapTab: 'words' }, { recapTab: 'tasks' }, { weekOff: 1 }, { weekOff: -1 }, { lumiOpen: true }, { asgOpen: true, libSel: {} }, { satStep: 0 }, { satStep: 2 }, { logOpen: true }, { skill: 0 },
+  { buyOpen: true }, { evFormOpen: true }, { taskRec: 'rec' }, { taskRec: 'done' }, { recOn: true }, { recDone: true },
   ...['account', 'appearance', 'language', 'notifications', 'lessons', 'privacy', 'desktop', 'help'].map(settingsTab => ({ settingsTab })),
 ];
 
@@ -170,10 +171,30 @@ test('real accounts with data render every screen', async () => {
   await call(portal, 'comment', { method: 'POST', token: t.token, body: { postId: p.body.id, text: 'Great job' } });
   await call(portal, 'report', { method: 'POST', token: t.token, body: { postId: p.body.id, reason: 'Test' } });
   await call(portal, 'state', { method: 'POST', token: s.token, body: { state: { joined: { g2: true }, savedWords: ['refill'], goal: 'Speak confidently', sat: { setup: true, date: 'Mar 13, 2027', has: true, goal: 1400, tests: [{ n: 'Practice 1', d: 'Oct 1', math: 600, rw: 560 }] } } } });
+  // Payments, events, a voice-note task.
+  assert.equal((await call(portal, 'buy', { method: 'POST', token: s.token, body: { packId: 'p2', method: 'wechat' } })).status, 201);
+  const ev = await call(portal, 'event', { method: 'POST', token: t.token, body: { title: 'Halloween Q&A', start: Date.now() + 3 * 864e5, dur: 45, link: 'https://example.org/meet' } });
+  assert.equal(ev.status, 201);
+  await call(portal, 'rsvp', { method: 'POST', token: s.token, body: { id: ev.body.id, on: true } });
+  assert.equal((await call(portal, 'task', { method: 'POST', token: t.token, body: { op: 'create', title: 'Describe your weekend', kind: 'Voice note', studentId: s.user.id } })).status, 201);
   SB = (await call(portal, 'bootstrap', { token: s.token })).body;
   TB = (await call(portal, 'bootstrap', { token: t.token })).body;
   const AD = (await call(admin, 'data', { token: A })).body;
   assert.equal(SB.lessons.length, 1); assert.equal(SB.assignments.length, 1); assert.ok(SB.posts.length >= 1);
   const errs = [...renderAll(liveApp(SB, 'student'), 'student', 'student with data'), ...renderAll(liveApp(TB, 'tutor'), 'tutor', 'mentor with data'), ...renderAll(adminApp(AD), 'admin', 'admin with data')];
   assert.deepEqual(errs, [], errs.join('\n'));
+  // New screens show the real data.
+  const st = liveApp(SB, 'student');
+  st.setState({ page: 'materials', matOpen: SB.assignments[0].materialId });
+  let V = st.renderVals();
+  assert.ok(V.mv.has && V.mv.blocks.length > 0, 'material viewer shows the blocks');
+  st.setState({ page: 'tasks', tFilter: 'all' }); V = st.renderVals();
+  assert.ok(V.tasksShown.some(k => k.recIdle && typeof k.startRec === 'function'), 'voice-note task can be recorded');
+  st.setState({ page: 'community', comTab: 'events', buyOpen: true }); V = st.renderVals();
+  assert.equal(V.events.length, 1); assert.ok(V.events[0].hasLink);
+  assert.ok(V.buy.packs.length >= 3 && V.buy.hasHistory, 'buy modal lists plans and the pending request');
+  assert.match(V.buy.wechatText, /WeChat/);
+  assert.equal(V.pr.nodes.length, 5);
+  const ad = adminApp(AD); ad.setState({ page: 'a_payments' }); V = ad.renderVals();
+  assert.equal(V.ap.pending.length, 1); assert.equal(V.aEvents.length, 1);
 });

@@ -1,9 +1,12 @@
 // Admin console API. Requires an admin token (POST /api/auth/login with the
 // ADMIN_USERNAME account). Every change is written to portal_audit.
+import { teamMsg } from '../_lib/team.js';
 import { cors, body, str, int, fail } from '../_lib/http.js';
-import { sql, getConfig, setConfig, audit } from '../_lib/db.js';
+import { sql, getConfig, setConfig, audit, addCredits } from '../_lib/db.js';
+import { packages, markPaid, stripeRefund } from '../_lib/payments.js';
+import { notify } from '../_lib/notify.js';
 import { session, signViewAsToken, SITE } from '../_lib/session.js';
-import { matOut, cleanMaterial, DEFAULT_FLAGS } from '../portal/[action].js';
+import { matOut, cleanMaterial, cleanEvent, DEFAULT_FLAGS } from '../portal/[action].js';
 import { createHash, randomBytes } from 'node:crypto';
 import { CA, BJ, parts } from '../_lib/time.js';
 
@@ -11,14 +14,6 @@ const ms = d => (d ? new Date(d).getTime() : null);
 const isUuid = v => /^[0-9a-f-]{36}$/i.test(String(v || ''));
 const ROLE_OUT = { student: 'Student', tutor: 'Mentor', parent: 'Parent' };
 const ROLE_IN = { Student: 'student', Mentor: 'tutor', Parent: 'parent' };
-export const DEFAULT_PKGS = [
-  { id: 'p1', name: 'Free intro lesson', price: '0', on: true },
-  { id: 'p2', name: 'Conversation 5-pack', price: '1250', on: true },
-  { id: 'p3', name: 'Conversation 10-pack', price: '2300', on: true },
-  { id: 'p4', name: 'IELTS Speaking 12-pack', price: '3480', on: true },
-  { id: 'p5', name: 'Pronunciation add-on', price: '480', on: true },
-  { id: 'p6', name: 'SAT Math 10-pack', price: '2900', on: false },
-];
 
 // How well a mentor fits a request: subject words they teach, overlap between
 // the student's Beijing-time grid and the mentor's California-time grid, and load.
@@ -61,7 +56,14 @@ async function data(req, res) {
   const auditRows = await sql`SELECT * FROM portal_audit ORDER BY created_at DESC LIMIT 200`;
   const signups = await sql`SELECT to_char(date_trunc('day', created_at AT TIME ZONE 'Asia/Shanghai'), 'YYYY-MM-DD') AS d, count(*)::int AS n FROM users WHERE created_at > now() - interval '7 days' GROUP BY 1`;
   const support = await sql`SELECT s.id, s.data, s.created_at, s.user_id FROM submissions s WHERE s.type = 'support_message' AND s.status = 'new' ORDER BY s.created_at DESC LIMIT 50`;
-  const [flags, maint, announce, annHist, modRules, pkgs] = await Promise.all([getConfig('flags', DEFAULT_FLAGS), getConfig('maint', false), getConfig('announce', null), getConfig('annHist', []), getConfig('modRules', { auto: true, first: false, links: true }), getConfig('pkgs', DEFAULT_PKGS)]);
+  const payments = await sql`SELECT p.*, u.name AS user_name FROM portal_payments p LEFT JOIN users u ON u.id = p.user_id ORDER BY p.created_at DESC LIMIT 300`;
+  // Mentor payouts: finished lessons per mentor per month (California time), at PAYOUT_USD_PER_LESSON.
+  const rate = Number(process.env.PAYOUT_USD_PER_LESSON || 20);
+  const done = await sql`SELECT l.tutor_id, t.name, to_char(l.start_at AT TIME ZONE 'America/Los_Angeles', 'YYYY-MM') AS month, count(*)::int AS n
+    FROM portal_lessons l JOIN users t ON t.id = l.tutor_id WHERE l.status = 'done' AND l.start_at > now() - interval '120 days' GROUP BY 1, 2, 3 ORDER BY 3 DESC, 2`;
+  const paid = await sql`SELECT tutor_id, month, paid_at FROM portal_payouts`;
+  const events = await sql`SELECT e.*, h.name AS host_name, (SELECT count(*)::int FROM portal_rsvps r WHERE r.event_id = e.id) AS going FROM portal_events e LEFT JOIN users h ON h.id = e.host_id WHERE e.start_at > now() - interval '1 day' ORDER BY e.start_at LIMIT 50`;
+  const [flags, maint, announce, annHist, modRules, pkgs] = await Promise.all([getConfig('flags', DEFAULT_FLAGS), getConfig('maint', false), getConfig('announce', null), getConfig('annHist', []), getConfig('modRules', { auto: true, first: false, links: true }), packages()]);
 
   return res.status(200).json({
     users: users.map(u => ({ id: u.id, name: u.name, email: u.email, username: u.username, role: ROLE_OUT[u.role] || 'Student', status: u.status === 'suspended' ? 'Suspended' : 'Active', loc: u.city || u.time_zone || '', credits: u.role === 'student' ? (u.credits || 0) : null,
@@ -75,6 +77,10 @@ async function data(req, res) {
     signups: Object.fromEntries(signups.map(s => [s.d, s.n])),
     support: support.map(s => ({ id: String(s.id), userId: s.user_id, name: s.data?.name, text: s.data?.text, at: ms(s.created_at) })),
     config: { flags: { ...DEFAULT_FLAGS, ...flags }, maint: !!maint, announce, annHist, modRules, pkgs },
+    payments: payments.map(p => ({ id: String(p.id), userId: p.user_id, who: p.user_name || 'Deleted account', what: p.name, amount: p.amount, credits: p.credits, method: p.method, status: p.status, at: ms(p.created_at), paidAt: ms(p.paid_at) })),
+    payouts: done.map(d => { const pd = paid.find(x => x.tutor_id === d.tutor_id && x.month === d.month); return { tutorId: d.tutor_id, name: d.name, month: d.month, lessons: d.n, amount: d.n * rate, paid: !!pd, paidAt: pd ? ms(pd.paid_at) : null }; }),
+    rate, stripe: !!process.env.STRIPE_SECRET_KEY, google: !!process.env.GOOGLE_CLIENT_ID, email: !!process.env.RESEND_API_KEY, push: !!process.env.VAPID_PUBLIC_KEY,
+    events: events.map(e => ({ id: String(e.id), title: e.title, kind: e.kind, start: ms(e.start_at), host: e.host_name || 'Global Link Team', going: e.going })),
     now: Date.now(),
   });
 }
@@ -97,7 +103,7 @@ async function user(req, res, s) {
     await audit(s.name, 'Changed ' + u.name + ' to ' + b.value, 'user-cog');
   } else if (b.op === 'credits') {
     const d = int(b.value, -50, 50, 0);
-    await sql`UPDATE portal_profiles SET credits = GREATEST(0, credits + ${d}) WHERE user_id = ${u.id}`;
+    if ((await addCredits(u.id, d, d > 0 ? 'Added by Global Link' : 'Removed by Global Link', 'admin')) === null) return fail(res, 400, 'They don’t have that many credits.');
     await audit(s.name, (d > 0 ? 'Gave ' + u.name + ' ' + d : 'Removed ' + -d + ' from ' + u.name) + ' lesson credit' + (Math.abs(d) === 1 ? '' : 's'), d > 0 ? 'plus' : 'minus');
   } else if (b.op === 'note') {
     await sql`UPDATE portal_profiles SET admin_note = ${str(b.value, 2000)} WHERE user_id = ${u.id}`;
@@ -134,8 +140,8 @@ async function match(req, res, s) {
   await sql`INSERT INTO portal_matches (student_id, tutor_id, subject, status, request_id) VALUES (${r.user_id}, ${t.id}, ${subject}, 'proposed', ${r.id})
     ON CONFLICT (student_id, tutor_id) DO UPDATE SET status = CASE WHEN portal_matches.status = 'active' THEN 'active' ELSE 'proposed' END, subject = EXCLUDED.subject, request_id = EXCLUDED.request_id, updated_at = now()`;
   await sql`UPDATE submissions SET status = 'reviewing' WHERE id = ${r.id}`;
-  await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${t.id}, ${`${r.name} would like lessons in ${subject || 'English'}. Accept or decline in Students.`})`;
-  await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${r.user_id}, ${`We suggested ${t.name} as your mentor. We’ll let you know as soon as they say yes.`})`;
+  await teamMsg(t.id, `${r.name} would like lessons in ${subject || 'English'}. Accept or decline in Students.`);
+  await teamMsg(r.user_id, `We suggested ${t.name} as your mentor. We’ll let you know as soon as they say yes.`);
   await audit(s.name, 'Matched ' + r.name + ' with ' + t.name, 'git-merge');
   return res.status(200).json({ ok: true });
 }
@@ -144,7 +150,7 @@ async function declineRequest(req, res, s) {
   const [r] = await sql`UPDATE submissions SET status = 'declined' WHERE id = ${int(b.requestId, 0, 9e15, 0)} AND type = 'mentor_request' RETURNING user_id, data`;
   if (!r) return fail(res, 404, 'Request not found.');
   const [u] = await sql`SELECT name FROM users WHERE id = ${r.user_id}`;
-  await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${r.user_id}, 'We couldn’t find a mentor for that request yet. We’ll keep looking and email you.')`;
+  await teamMsg(r.user_id, 'We couldn’t find a mentor for that request yet. We’ll keep looking and email you.');
   await audit(s.name, 'Told ' + (u?.name || 'a student') + ' we can’t match yet', 'x');
   return res.status(200).json({ ok: true });
 }
@@ -154,8 +160,8 @@ async function lesson(req, res, s) {
   const [l] = await sql`SELECT l.*, s.name AS sn, t.name AS tn FROM portal_lessons l JOIN users s ON s.id = l.student_id LEFT JOIN users t ON t.id = l.tutor_id WHERE l.id = ${int(b.id, 0, 9e15, 0)}`;
   if (!l) return fail(res, 404, 'Lesson not found.');
   await sql`UPDATE portal_lessons SET status = 'cancelled' WHERE id = ${l.id}`;
-  if (b.op === 'credit' || b.op === 'cancel') await sql`UPDATE portal_profiles SET credits = credits + 1 WHERE user_id = ${l.student_id}`;
-  for (const id of [l.student_id, l.tutor_id].filter(Boolean)) await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${id}, ${'The Global Link team cancelled the lesson between ' + (l.tn || 'your mentor') + ' and ' + l.sn + '. The lesson credit was returned.'})`;
+  if ((b.op === 'credit' || b.op === 'cancel') && l.credit_used && l.status === 'scheduled') await addCredits(l.student_id, 1, b.op === 'credit' ? 'Returned after a no-show' : 'Lesson cancelled by Global Link', 'lesson:' + l.id);
+  for (const id of [l.student_id, l.tutor_id].filter(Boolean)) await teamMsg(id, 'The Global Link team cancelled the lesson between ' + (l.tn || 'your mentor') + ' and ' + l.sn + '. The lesson credit was returned.');
   await audit(s.name, (b.op === 'credit' ? 'Returned ' + l.sn + '’s credit after a no-show' : 'Cancelled ' + (l.tn || '') + ' and ' + l.sn + '’s lesson and returned the credit'), b.op === 'credit' ? 'rotate-ccw' : 'calendar-x');
   return res.status(200).json({ ok: true });
 }
@@ -171,7 +177,7 @@ async function material(req, res, s) {
       ? await sql`UPDATE portal_materials SET status = ${status}, title = ${m.title || 'Untitled'}, type = ${m.type}, pack = ${m.pack}, level = ${m.level}, blocks = ${JSON.stringify(m.blocks)}::jsonb, updated_at = now() WHERE id = ${int(b.id, 0, 9e15, 0)} AND owner_id IS NOT NULL RETURNING title, owner_id`
       : await sql`UPDATE portal_materials SET status = ${status}, updated_at = now() WHERE id = ${int(b.id, 0, 9e15, 0)} AND owner_id IS NOT NULL RETURNING title, owner_id`;
     if (!r) return fail(res, 404, 'Material not found.');
-    await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${r.owner_id}, ${b.approve ? `“${r.title}” is approved. Every mentor can use it now.` : `The team asked for a few changes on “${r.title}”. Open it in Materials.`})`;
+    await teamMsg(r.owner_id, b.approve ? `“${r.title}” is approved. Every mentor can use it now.` : `The team asked for a few changes on “${r.title}”. Open it in Materials.`);
     await audit(s.name, (b.approve ? 'Approved “' : 'Asked for changes on “') + r.title + '”', b.approve ? 'badge-check' : 'message-square-warning');
     return res.status(200).json({ ok: true });
   }
@@ -205,7 +211,7 @@ async function moderate(req, res, s) {
   if (!p) return fail(res, 404, 'Post not found.');
   if (b.op === 'remove') await sql`UPDATE portal_posts SET hidden = true WHERE id = ${id}`;
   if (b.op === 'keep') await sql`UPDATE portal_posts SET hidden = false WHERE id = ${id}`;
-  if (b.op === 'warn' && p.author_id) await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${p.author_id}, ${'A note from the Global Link team: your post “' + p.title.slice(0, 80) + '” was reported. Please keep the community kind and on-topic.'})`;
+  if (b.op === 'warn' && p.author_id) await teamMsg(p.author_id, 'A note from the Global Link team: your post “' + p.title.slice(0, 80) + '” was reported. Please keep the community kind and on-topic.');
   await sql`UPDATE portal_reports SET status = 'closed' WHERE post_id = ${id}`;
   await audit(s.name, { remove: 'Removed', keep: 'Kept', warn: 'Warned the author of' }[b.op] + ' a reported post by ' + (p.author || 'a member'), { remove: 'trash-2', keep: 'check', warn: 'triangle-alert' }[b.op] || 'shield');
   return res.status(200).json({ ok: true });
@@ -227,8 +233,9 @@ async function message(req, res, s) {
   const text = str(b.text, 4000);
   const [u] = await sql`SELECT id, name FROM users WHERE id = ${isUuid(b.to) ? b.to : null}`;
   if (!u || !text) return fail(res, 400, 'Pick a person and write a message.');
-  await sql`INSERT INTO portal_messages (sender_id, recipient_id, body) VALUES (NULL, ${u.id}, ${text})`;
+  await teamMsg(u.id, text);
   await sql`UPDATE submissions SET status = 'answered' WHERE type = 'support_message' AND user_id = ${u.id} AND status = 'new'`;
+  await notify(u.id, { kind: 'message', title: 'Global Link Team', body: text, path: '/#/messages', email: true });
   await audit(s.name, 'Messaged ' + u.name + ' as the Global Link team', 'message-circle');
   return res.status(200).json({ ok: true });
 }
@@ -239,10 +246,58 @@ async function thread(req, res) {
   return res.status(200).json({ msgs: rows.reverse().map(r => ({ me: !r.sender_id, t: r.body, at: ms(r.created_at) })) });
 }
 
+// ---- payments ----
+async function payment(req, res, s) {
+  const b = body(req) || {};
+  if (b.op === 'record') { // a WeChat (or other) payment received outside the app
+    const pk = (await packages()).find(p => p.id === b.packId);
+    const [u] = await sql`SELECT id, name FROM users WHERE id = ${isUuid(b.userId) ? b.userId : null} AND role = 'student'`;
+    if (!pk || !u) return fail(res, 400, 'Pick a student and a plan.');
+    const amount = int(b.amount, 0, 1e6, Number(pk.price) || 0);
+    const [p] = await sql`INSERT INTO portal_payments (user_id, pack_id, name, amount, credits, method, status, note) VALUES (${u.id}, ${pk.id}, ${pk.name}, ${amount}, ${pk.credits}, ${['wechat', 'alipay', 'cash', 'bank'].includes(b.method) ? b.method : 'wechat'}, 'pending', ${str(b.note, 300)}) RETURNING id`;
+    await markPaid(p.id, s.name);
+    return res.status(201).json({ id: String(p.id) });
+  }
+  const [p] = await sql`SELECT * FROM portal_payments WHERE id = ${int(b.id, 0, 9e15, 0)}`;
+  if (!p) return fail(res, 404, 'Payment not found.');
+  if (b.op === 'confirm') { await markPaid(p.id, s.name); return res.status(200).json({ ok: true }); }
+  if (b.op === 'cancel' && p.status === 'pending') { await sql`UPDATE portal_payments SET status = 'cancelled' WHERE id = ${p.id}`; await audit(s.name, 'Cancelled payment request #' + p.id, 'x'); return res.status(200).json({ ok: true }); }
+  if (b.op === 'refund' && p.status === 'paid') {
+    await stripeRefund(p);
+    await sql`UPDATE portal_payments SET status = 'refunded', refunded_at = now() WHERE id = ${p.id}`;
+    if (p.user_id && p.credits) { const [pr] = await sql`SELECT credits FROM portal_profiles WHERE user_id = ${p.user_id}`; const take = Math.min(p.credits, pr ? pr.credits : 0); if (take) await addCredits(p.user_id, -take, 'Refunded ' + p.name, 'pay:' + p.id); }
+    if (p.user_id) await teamMsg(p.user_id, 'Your payment for ' + p.name + ' was refunded.');
+    await audit(s.name, 'Refunded ¥' + p.amount + ' for ' + p.name, 'undo-2');
+    return res.status(200).json({ ok: true });
+  }
+  return fail(res, 400, 'Unknown payment change.');
+}
+async function payout(req, res, s) {
+  const b = body(req) || {}, month = str(b.month, 7);
+  if (!isUuid(b.tutorId) || !/^\d{4}-\d{2}$/.test(month)) return fail(res, 400, 'Pick a mentor and month.');
+  const [d] = await sql`SELECT count(*)::int AS n FROM portal_lessons WHERE tutor_id = ${b.tutorId} AND status = 'done' AND to_char(start_at AT TIME ZONE 'America/Los_Angeles', 'YYYY-MM') = ${month}`;
+  const amount = d.n * Number(process.env.PAYOUT_USD_PER_LESSON || 20);
+  await sql`INSERT INTO portal_payouts (tutor_id, month, lessons, amount_usd) VALUES (${b.tutorId}, ${month}, ${d.n}, ${amount}) ON CONFLICT (tutor_id, month) DO NOTHING`;
+  await teamMsg(b.tutorId, 'Your payout for ' + month + ' ($' + amount + ', ' + d.n + ' lessons) is on its way. Thank you!');
+  await audit(s.name, 'Marked the ' + month + ' payout paid ($' + amount + ')', 'wallet');
+  return res.status(200).json({ ok: true });
+}
+// ---- community events hosted by Global Link ----
+async function event(req, res, s) {
+  const b = body(req) || {};
+  if (b.op === 'delete') { await sql`DELETE FROM portal_events WHERE id = ${int(b.id, 0, 9e15, 0)}`; await audit(s.name, 'Removed an event', 'calendar-x'); return res.status(200).json({ ok: true }); }
+  const e = cleanEvent(b);
+  if (e.error) return fail(res, 400, e.error);
+  const [r] = await sql`INSERT INTO portal_events (host_id, title, kind, body, start_at, dur_min, link) VALUES (NULL, ${e.title}, ${e.kind}, ${e.body}, ${new Date(e.start).toISOString()}, ${e.dur}, ${e.link || null}) RETURNING id`;
+  await audit(s.name, 'Posted the event “' + e.title + '”', 'calendar-plus');
+  return res.status(201).json({ id: String(r.id) });
+}
+
 const ROUTES = {
   data: ['GET', data], thread: ['GET', thread],
   user: ['POST', user], 'view-as': ['POST', viewAs], reset: ['POST', reset], match: ['POST', match], 'decline-request': ['POST', declineRequest],
   lesson: ['POST', lesson], material: ['POST', material], moderate: ['POST', moderate], config: ['POST', config], message: ['POST', message],
+  payment: ['POST', payment], payout: ['POST', payout], event: ['POST', event],
 };
 
 export default async function handler(req, res) {

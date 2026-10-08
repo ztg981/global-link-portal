@@ -1,6 +1,9 @@
 // Exact-match patches for the design's component script. Each [from, to, count?].
 // Demo behaviour is unchanged; LIVE branches use the API through live.js.
-export { MODE_CODE, METHODS } from './live-methods.mjs';
+import { MODE_CODE, METHODS as M1 } from './live-methods.mjs';
+import { METHODS_2 } from './live-methods-2.mjs';
+export { MODE_CODE };
+export const METHODS = M1 + METHODS_2;
 const r = String.raw;
 
 export const SCRIPT_PATCHES = [
@@ -29,7 +32,10 @@ export const SCRIPT_PATCHES = [
   [r`    try{if(window.claude&&window.claude.complete){reply=await window.claude.complete({messages:[{role:'user',content:'You are Lumi, the friendly AI helper inside the Global Link learning app. You help a Chinese high-school student named Mia practice English between lessons with American mentors. Reply in 1-3 short, warm sentences of simple English. Gently correct one mistake if there is one (show the better phrasing), then ask one follow-up question. If she writes Chinese, answer in English and add a short Chinese hint. No emoji.\n\nConversation so far:\n'+msgs.map(m=>(m.from==='bot'?'Lumi: ':'Mia: ')+m.t).join('\n')+'\nLumi:'}]});}}catch(e){}
     if(!reply)reply='Nice! A small tip: say "I went hiking with my family" instead of "I go hiking". What was your favorite moment?';`,
    r`    try{reply=(await GLLive.api('portal/lumi',{messages:msgs.slice(-12).map(m=>({role:m.from==='bot'?'assistant':'user',content:m.t}))})).text;}catch(e){if(e&&e.status===429)reply=e.message;}
+    if(LIVE&&reply)this.markPractice();
     if(!reply)reply=LIVE?'Lumi is resting for a moment. Please try again soon.':'Nice! A small tip: say "I went hiking with my family" instead of "I go hiking". What was your favorite moment?';`],
+
+  [r`rsvpGo:()=>{this.setState(x=>`, r`rsvpGo:()=>{if(LIVE)this.sync('portal/rsvp',{id:e.id,on:!on},true);this.setState(x=>`],
 
   // Admin can always go back to the console from any account view.
   [r`  go(p){this.setState({page:p,`, r`  go(p){if(String(p).startsWith('a_')&&this.state.role!=='admin')return;this.setState({page:p,`],
@@ -122,7 +128,7 @@ export const SCRIPT_PATCHES = [
    r`'Slow down on the last step. You knew the answer, you rushed the sign.'}]).map(n=>({...n,name:(MENTORS[n.m]||{first:''}).first,photo:(MENTORS[n.m]||{}).photo||''}));`],
   [r`const platform=p.platform||'web';`, r`const platform=(window.glApp&&window.glApp.platformProp)||p.platform||'web';`],
   [r`signInWeChat:()=>{this.toast('Opening WeChat to confirm…','message-circle');this.later(()=>this.startSync('student'),700);},signInGoogle:()=>{this.toast('Opening Google sign-in…','log-in');this.later(()=>this.startSync('student'),700);},`,
-   r`signInWeChat:()=>this.toast('WeChat sign-in is coming soon. Use your globallink.com username and password for now.','message-circle'),signInGoogle:()=>this.toast('Google sign-in is coming to the app soon. Use your globallink.com username and password for now.','log-in'),`],
+   r`signInWeChat:()=>this.toast('WeChat sign-in is coming soon. Use your globallink.com username and password for now.','message-circle'),signInGoogle:()=>this.googleSignIn(),`],
   [r`syncTitle:t?'Welcome, Emma':'Welcome, Mia',syncItems,`, r`syncTitle:LIVE&&LIVE.me?'Welcome, '+GLLive.first(LIVE.me.name):s.resuming?'Welcome back':(t?'Welcome, Emma':'Welcome, Mia'),syncItems,`],
   [r`signOut:()=>this.setState({stage:'signin',meOpen:false,call:null}),`, r`signOut:()=>this.signOut(),`],
   [r`resched:()=>{this.setState({sessFor:null});`, r`resched:()=>{if(LIVE&&sf&&!sf.requested){this.sync('portal/message',{to:t?sf.who:sf.m,text:'Hi! Could we reschedule our lesson on '+sf.when+'? Which times work for you?'},true);}this.setState({sessFor:null});`],
@@ -234,6 +240,10 @@ export const SCRIPT_PATCHES = [
     V.needOtp=!!s.needOtp;V.otp=s.otp||'';V.setOtp=v=>this.setState({otp:v,signErr:''});V.setKeep=e=>this.setState({keep:!!(e&&e.target&&e.target.checked)});
     V.T={matsEmpty:'Nothing matches that yet.',feedEmpty:'Nothing here yet. Be the first to post.',satSetup:'Tell us your test date, your latest score and your goal. David builds your practice around it, and every practice test you log updates this page.',satDiag:'No problem. David will send a 30-minute diagnostic test. Your score shows up here when you finish.',satAsk:'Ask David to cover it next lesson',quizWait:'Mia is answering',quizDone:'Mia got it right',wordPop:'Pops up on Mia’s screen with sound and 中文.',slides:'Golden Week story map',endTitle:'Nice work, Mia!',endSub:'You talked for 18 of 40 minutes. That’s your best yet.',feelNote:'Emma sees this. It helps her plan next week.',leaveTitle:'Leave Mia a note',leaveSub:'It lands on her home screen as a sticky note. Short and kind works best.'};
     V.weekEmptyMsg=V.notThisWeek;V.qs=V.qs.map(q=>({...q,showPlay:q.answered,hasAns:false}));V.qsEmpty=false;V.sharedEmpty=false;V.weeksEmpty=false;V.wordsEmpty=false;V.notesEmpty=false;V.mentorsEmpty=false;V.pastEmpty=false;V.studsEmptyPage=false;V.showStuds=true;V.isTutorRole=t;V.noClasses=false;V.hasClasses=false;V.lv={};
+    V.buyOpen=false;V.buy={packs:[],history:[]};V.openBuy=()=>this.toast('Opening plans on globallink.com','external-link');V.closeBuy=()=>{};V.buyWechat=()=>{};V.buyStripe=()=>{};
+    V.evFormOpen=false;V.evf={kinds:[],durs:[]};V.openEventForm=()=>{};V.closeEventForm=()=>{};V.canHostEvent=false;V.events=(V.events||[]).map(e=>({...e,hasLink:false}));
+    V.mv={has:false};V.T.matW='460px';V.T.recBg='url(assets/emma.png) center 25%/cover #0c1730';V.attachFile=()=>this.toast('Attachments work in real accounts.','paperclip');
+    V.tasksShown=(V.tasksShown||[]).map(k=>({...k,startRec:V.startTaskRec}));V.pr={nodes:[]};V.ap={kpis:[],pending:[],all:[],payouts:[]};V.aEvents=[];V.aEventsEmpty=true;
     V.signupHref=SITE_URL+'/#/start';V.forgotHref=SITE_URL+'/#/login';V.isDesktop=!!window.glDesktop;
     if(LIVE)this.liveVals(V);
     return V;

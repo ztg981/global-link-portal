@@ -228,6 +228,88 @@ async function migrate(q) {
     value JSONB NOT NULL,
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`;
+  // One-time sign-in codes for Google (same table and rules as the website).
+  await q`CREATE TABLE IF NOT EXISTS oauth_pending (
+    code_hash TEXT PRIMARY KEY,
+    provider TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    email TEXT NOT NULL,
+    name TEXT,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used_at TIMESTAMPTZ
+  )`;
+  await q`CREATE UNIQUE INDEX IF NOT EXISTS users_google_sub_key ON users (google_sub) WHERE google_sub IS NOT NULL`;
+  // Columns added after the first release.
+  await q`ALTER TABLE portal_profiles ADD COLUMN IF NOT EXISTS packs JSONB NOT NULL DEFAULT '[]'`;
+  await q`ALTER TABLE portal_profiles ADD COLUMN IF NOT EXISTS intro_granted BOOLEAN NOT NULL DEFAULT false`;
+  await q`ALTER TABLE portal_profiles ADD COLUMN IF NOT EXISTS emailed_at TIMESTAMPTZ`;
+  await q`ALTER TABLE portal_lessons ADD COLUMN IF NOT EXISTS reminded JSONB NOT NULL DEFAULT '{}'`;
+  await q`ALTER TABLE portal_lessons ADD COLUMN IF NOT EXISTS credit_used BOOLEAN NOT NULL DEFAULT false`;
+  await q`ALTER TABLE portal_questions ADD COLUMN IF NOT EXISTS video_url TEXT`;
+  await q`ALTER TABLE portal_questions ADD COLUMN IF NOT EXISTS expired BOOLEAN NOT NULL DEFAULT false`;
+  await q`ALTER TABLE portal_messages ADD COLUMN IF NOT EXISTS file JSONB`;
+  await q`ALTER TABLE portal_tasks ADD COLUMN IF NOT EXISTS submission JSONB`;
+  // Web Push subscriptions (phones with the home-screen app, desktop browsers).
+  await q`CREATE TABLE IF NOT EXISTS portal_push (
+    id BIGSERIAL PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    endpoint TEXT NOT NULL UNIQUE,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`;
+  // Lesson credits: every change is a ledger row; portal_profiles.credits is the balance.
+  await q`CREATE TABLE IF NOT EXISTS portal_credit_events (
+    id BIGSERIAL PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    delta INT NOT NULL,
+    reason TEXT NOT NULL,
+    ref TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`;
+  // Payments: WeChat transfers recorded by the team, or Stripe Checkout.
+  await q`CREATE TABLE IF NOT EXISTS portal_payments (
+    id BIGSERIAL PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    pack_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    amount INT NOT NULL DEFAULT 0,
+    currency TEXT NOT NULL DEFAULT 'CNY',
+    credits INT NOT NULL DEFAULT 0,
+    method TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    ref TEXT UNIQUE,
+    note TEXT NOT NULL DEFAULT '',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    paid_at TIMESTAMPTZ,
+    refunded_at TIMESTAMPTZ
+  )`;
+  await q`CREATE TABLE IF NOT EXISTS portal_payouts (
+    id BIGSERIAL PRIMARY KEY,
+    tutor_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    month TEXT NOT NULL,
+    lessons INT NOT NULL,
+    amount_usd INT NOT NULL,
+    paid_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (tutor_id, month)
+  )`;
+  await q`CREATE TABLE IF NOT EXISTS portal_events (
+    id BIGSERIAL PRIMARY KEY,
+    host_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    kind TEXT NOT NULL DEFAULT 'Live Q&A',
+    body TEXT NOT NULL DEFAULT '',
+    start_at TIMESTAMPTZ NOT NULL,
+    dur_min INT NOT NULL DEFAULT 45,
+    link TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`;
+  await q`CREATE TABLE IF NOT EXISTS portal_rsvps (
+    event_id BIGINT NOT NULL REFERENCES portal_events(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (event_id, user_id)
+  )`;
   await q`CREATE TABLE IF NOT EXISTS portal_audit (
     id BIGSERIAL PRIMARY KEY,
     actor TEXT NOT NULL,
@@ -265,4 +347,16 @@ export async function setConfig(key, value) {
 }
 export async function audit(actor, action, icon) {
   await sql`INSERT INTO portal_audit (actor, action, icon) VALUES (${actor}, ${String(action).slice(0, 300)}, ${icon || 'check'})`;
+}
+
+// Lesson credits. Every change is a ledger row; the balance never goes below 0.
+// Returns the new balance, or null if the user didn't have enough.
+export async function addCredits(userId, delta, reason, ref) {
+  await sql`INSERT INTO portal_profiles (user_id) VALUES (${userId}) ON CONFLICT DO NOTHING`;
+  const rows = delta < 0
+    ? await sql`UPDATE portal_profiles SET credits = credits + ${delta} WHERE user_id = ${userId} AND credits + ${delta} >= 0 RETURNING credits`
+    : await sql`UPDATE portal_profiles SET credits = credits + ${delta} WHERE user_id = ${userId} RETURNING credits`;
+  if (!rows.length) return null;
+  await sql`INSERT INTO portal_credit_events (user_id, delta, reason, ref) VALUES (${userId}, ${delta}, ${reason}, ${ref || null})`;
+  return rows[0].credits;
 }

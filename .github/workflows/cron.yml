@@ -1,0 +1,15 @@
+# Runs the app's scheduled jobs (lesson reminders, wrap-up) every 10 minutes.
+# Needs the repository secret CRON_SECRET (same value as the Vercel env var).
+name: Scheduled jobs
+on:
+  schedule: [{ cron: '*/10 * * * *' }]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call /api/cron
+        env: { CRON_SECRET: '${{ secrets.CRON_SECRET }}' }
+        run: curl -fsS -m 60 -H "Authorization: Bearer $CRON_SECRET" https://global-link-portal.vercel.app/api/cron

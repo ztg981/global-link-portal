@@ -88,8 +88,26 @@ npm run security:scan  # no secrets in files git would publish
 Vercel project root = this repo. Set the environment variables from
 [`.env.example`](.env.example). `DATABASE_URL` and `AUTH_SECRET` **must equal the
 website's**. Functions: `api/auth/[action]`, `api/portal/[action]`,
-`api/admin/[action]`, `api/health`. Security headers and download redirects
+`api/admin/[action]`, `api/cron`, `api/stripe`, `api/health`. Security headers and download redirects
 (`/download/windows`, `/download/mac`, `/download/mac-intel`) are in `vercel.json`.
+
+**Scheduled jobs** (`/api/cron`, needs `CRON_SECRET`): lesson reminders a day and
+15 minutes ahead, marking finished lessons done, expiring unanswered questions
+after 72 hours (the credit goes back) and stale payment requests after 14 days.
+Vercel runs it daily; [`.github/workflows/cron.yml`](.github/workflows/cron.yml)
+runs it every 10 minutes (repository secret `CRON_SECRET`).
+
+**Optional services** (each switches itself on when its variables are set):
+
+| Feature | Variables |
+|---|---|
+| Google sign-in (web and desktop) | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`; redirect URI `https://<app>/api/auth/google-callback` |
+| Push notifications | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` |
+| Email (reminders, replies, payments) | `RESEND_API_KEY`, `EMAIL_FROM` |
+| Card payments in the app | `STRIPE_SECRET_KEY` (test or live key); webhook URL `/api/stripe` (optional, checkout also settles on return) |
+| WeChat payments (confirmed by the team) | optional `WECHAT_PAY_ID` (shown to families) |
+| Uploads (voice notes, video replies, files) | `BLOB_READ_WRITE_TOKEN` (Vercel Blob) |
+| Mentor payouts | optional `PAYOUT_USD_PER_LESSON` (default 20) |
 
 ## Desktop app
 
@@ -99,7 +117,7 @@ Sandboxed, context-isolated, no Node in the page, navigation locked to the app's
 origin; see [SECURITY.md](SECURITY.md).
 
 **Release:** bump `desktop/package.json` `version`, then
-`git tag v0.1.1 && git push origin v0.1.1`. GitHub Actions builds the Windows
+`git tag v0.1.2 && git push origin v0.1.2`. GitHub Actions builds the Windows
 installer and the macOS DMGs/ZIPs (Apple silicon and Intel) and publishes them to
 a GitHub Release with `latest.yml` / `latest-mac.yml`.
 
@@ -134,10 +152,16 @@ posts, comments, likes, reports, auto-hide and link blocking; announcements,
 maintenance banner, feature switches and remote reload; admin People (suspend,
 credits, role, notes, password-reset links, read-only "view as"), audit log;
 preferences, onboarding, SAT tracker and saved words synced to the account;
-Lumi and translation.
+Lumi and translation; Google sign-in (website and app, including the desktop
+app through a `globallink://` link); lesson credits (a free intro lesson, one
+credit per booking, refunded on early cancellation); buying lessons (WeChat
+request confirmed by the team, or Stripe checkout); admin Payments (confirm,
+record, refund, mentor payouts); community events with RSVPs and join links;
+voice-note tasks, video replies and file attachments (Vercel Blob, 4 MB);
+the material viewer with quizzes and progress; the AI Practice path; push and
+email notifications; lesson reminders.
 
 **Preview / to be built:** live video (the lesson room is kept as designed and
-labelled a preview, ready for LiveKit/Agora/Zoom), recordings, transcripts and
-recaps, voice and video replies, payments (WeChat Pay/Alipay), WeChat and Google
-sign-in in the app (Google works on the website), events, push notifications
-while the app is closed.
+labelled a preview, ready for LiveKit/Agora/Zoom), lesson recordings,
+transcripts and recaps, WeChat sign-in, and paying with WeChat Pay/Alipay inside
+the app (families pay on WeChat and the team confirms it).

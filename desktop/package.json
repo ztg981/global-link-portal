@@ -1,7 +1,7 @@
 {
   "name": "global-link-desktop",
   "productName": "Global Link",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Global Link for Windows and macOS",
   "author": "Global Link",
   "license": "UNLICENSED",
@@ -26,11 +26,36 @@
     "appId": "com.globallink.portal",
     "productName": "Global Link",
     "copyright": "Global Link",
-    "directories": { "output": "release", "buildResources": "build" },
-    "files": ["main.cjs", "preload.cjs", "offline.html", "build/icon.png", "build/tray.png", "build/tray@2x.png", "package.json"],
-    "publish": [{ "provider": "github", "owner": "ztg981", "repo": "global-link-portal", "releaseType": "draft" }],
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "offline.html",
+      "build/icon.png",
+      "build/tray.png",
+      "build/tray@2x.png",
+      "package.json"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "ztg981",
+        "repo": "global-link-portal",
+        "releaseType": "draft"
+      }
+    ],
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "build/icon.png",
       "artifactName": "Global-Link-Setup.${ext}"
     },
@@ -42,7 +67,10 @@
       "shortcutName": "Global Link"
     },
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "category": "public.app-category.education",
       "icon": "build/icon.png",
       "identity": "-",
@@ -54,6 +82,16 @@
         "NSMicrophoneUsageDescription": "Global Link uses your microphone for video lessons."
       }
     },
-    "dmg": { "artifactName": "Global-Link-mac-${arch}.${ext}" }
+    "dmg": {
+      "artifactName": "Global-Link-mac-${arch}.${ext}"
+    },
+    "protocols": [
+      {
+        "name": "Global Link",
+        "schemes": [
+          "globallink"
+        ]
+      }
+    ]
   }
 }

@@ -25,13 +25,22 @@ Report problems privately to the Global Link team (support@globallink.com), not 
   per day, site-wide) and translation.
 - All SQL is parameterized. Inputs are length-limited, material blocks are
   allow-listed, and saved preferences only accept known keys.
+- Google sign-in uses a random `state` in an HttpOnly, SameSite=Lax cookie and only
+  signs in existing accounts with a verified Google email. The app gets a one-time
+  code (single use, 2 minutes), never a token in a URL.
+- Uploads: authenticated, rate-limited, max 4 MB, content-type allow-list, random
+  file names. Messages, answers and materials only accept file URLs on our own
+  Vercel Blob store.
+- Payments: credits change only through a ledger (`portal_credit_events`) that
+  can't go below zero. Stripe sessions and webhook events are re-read from Stripe
+  before any credit is added, and each payment is settled once.
 
 ## Web
 - Content-Security-Policy (no third-party scripts; React, icons and the design system
   are self-hosted), HSTS, `X-Frame-Options: DENY`, `frame-ancestors 'none'`, COOP,
   nosniff, strict referrer policy, Permissions-Policy (camera/microphone only for
   this site). `/api` responses are `no-store`.
-- The service worker never caches `/api`.
+- The service worker never caches `/api`. Notification clicks only open this site.
 - Tokens are kept in localStorage ("keep me signed in") or sessionStorage.
 
 ## Desktop app
@@ -40,10 +49,13 @@ Report problems privately to the Global Link team (support@globallink.com), not 
 - The window can only navigate within the app's origin; other links open in the
   default browser. Pop-ups are denied.
 - Only the app's origin may request notifications and camera/microphone.
+- The `globallink://` link only accepts `globallink://oauth/<one-time code>`.
 - Updates come from this repository's GitHub Releases over HTTPS (electron-updater
   checks the published SHA-512).
 
 ## Known limits
 - macOS builds are ad-hoc signed until an Apple Developer ID is added, and Windows
   builds are unsigned (SmartScreen shows a warning the first time).
-- Live video, payments and WeChat sign-in are not built yet.
+- Live video, WeChat sign-in and paying with WeChat Pay/Alipay inside the app are
+  not built yet. Sending email to anyone but the account owner needs a verified
+  domain in Resend.

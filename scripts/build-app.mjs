@@ -58,6 +58,9 @@ function encodeCase(html) {
   html = html.replace(new RegExp('<(x-import|dc-import)(' + ATTRS + ')/>', 'gi'), (_, t, a) => '<' + t + a + '></' + t + '>');
   html = html.replace(/<helmet(\s|>)/gi, '<sc-helmet$1').replace(/<\/helmet\s*>/gi, '</sc-helmet>');
   html = html.replace(/(\s)([a-z]+[A-Z][A-Za-z0-9]*)(\s*=)/g, (_, sp, name, eq) => sp + 'sc-camel-' + name.replace(/[A-Z]/g, c => '-' + c.toLowerCase()) + eq);
+  // Bound media sources (src="{{ … }}") would make the browser fetch the raw
+  // placeholder while parsing the template; the runtime decodes this back to src.
+  html = html.replace(/(\s)src(="\{\{)/g, '$1sc-camel-src$2');
   for (const [real, alias] of Object.entries(RAW_WRAP)) html = html.replace(new RegExp('(</?)' + real + '(?=[\\s>])', 'gi'), '$1' + alias);
   return html;
 }

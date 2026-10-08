@@ -48,8 +48,10 @@ http.createServer(async (req, res) => {
     if (url.pathname.startsWith('/api/')) {
       const hit = await findApi(url.pathname);
       if (!hit) { res.writeHead(404, { 'content-type': 'application/json' }).end('{"error":"Not found"}'); return; }
-      let raw = ''; for await (const c of req) raw += c;
-      req.body = raw ? (() => { try { return JSON.parse(raw); } catch { return raw; } })() : undefined;
+      const chunks = []; for await (const c of req) chunks.push(Buffer.from(c));
+      const buf = Buffer.concat(chunks), json = /json/.test(req.headers['content-type'] || '') || /^[[{]/.test(buf.slice(0, 1).toString());
+      // Like Vercel: JSON is parsed, anything else (file uploads) stays a Buffer.
+      req.body = !buf.length ? undefined : json ? (() => { try { return JSON.parse(buf.toString()); } catch { return buf.toString(); } })() : buf;
       req.query = { ...Object.fromEntries(url.searchParams), ...hit.query };
       res.status = c => { res.statusCode = c; return res; };
       res.json = j => { if (!res.getHeader('content-type')) res.setHeader('content-type', 'application/json'); res.end(JSON.stringify(j)); return res; };

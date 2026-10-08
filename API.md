@@ -22,6 +22,9 @@ way around for normal member tokens). Three kinds:
 | PATCH | `me` | `{ name?, lang?, timeZone? }` | `{ user }` |
 | POST | `password` | `{ current, next }` | `{ token, user }` (signs out other sessions) |
 | GET | `providers` | | `{ google, wechat, site }` |
+| GET | `google` | `?desktop=1` | Redirects to Google (state cookie) |
+| GET | `google-callback` | | Existing account → `/#/oauth/<code>` (desktop: `globallink://oauth/<code>`); else `/#/oauth-error/<why>` |
+| POST | `oauth` | `{ code }` | One-time code (2 min) → `{ token, user }` |
 
 Sign-up, password reset and parent accounts are on the website.
 
@@ -32,15 +35,21 @@ Sign-up, password reset and parent accounts are on the website.
 | GET | `bootstrap` | | Everything for the signed-in user (below) |
 | GET | `sync` | | Threads and site config, for polling |
 | POST | `state` | `{ state: {...} }` | Saves preferences/onboarding/practice (allow-listed keys) |
-| POST | `message` | `{ to: userId \| "team", text, mats? }` | Only to matched mentors/students or the team |
+| POST | `message` | `{ to: userId \| "team", text, mats?, file? }` | Only to matched mentors/students or the team; `file` from `upload` |
 | POST | `read` | `{ from: userId \| "team" }` | Marks a thread read |
 | POST | `request` | `{ subject, note?, mentorName?, times? }` | Student asks for a mentor (`submissions.type = mentor_request`, same as the website) |
 | POST | `cancel-request` | `{ id }` | |
 | POST | `respond` | `{ id: matchId, accept }` | Mentor accepts/declines a match |
-| POST | `book` | `{ tutorId, start: ms }` | Inside the mentor's hours, ≥30 min ahead, no clashes |
+| POST | `book` | `{ tutorId, start: ms }` | Inside the mentor's hours, ≥30 min ahead, no clashes; uses one credit (`402` when out) |
 | POST | `lesson` | `{ id, op: "cancel" \| "feedback", text?, next?, color? }` | |
-| POST | `task` | `{ op: "create" \| "done" \| "delete", ... }` | |
-| POST | `ask` / `answer` | `{ to, q, kind, share }` / `{ id, text }` | Ask a mentor |
+| POST | `task` | `{ op: "create" \| "done" \| "delete" \| "submit", ... }` | `submit`: `{ id, file }` voice note for a mentor's task |
+| POST | `ask` / `answer` | `{ to, q, kind, share }` / `{ id, text, video? }` | Ask a mentor; video replies upload first |
+| POST | `upload` | raw body, `?kind=voice\|video\|image\|file\|material&name=&type=&secs=` | `{ url, name, type, size }` (Vercel Blob, max 4 MB, type allow-list) |
+| POST | `push-subscribe` / `push-unsubscribe` | Web Push subscription | |
+| POST | `buy` | `{ packId, method: "wechat" \| "stripe" }` | WeChat: payment request + team message. Stripe: `{ url }` to Checkout |
+| POST | `checkout-status` | `{ sessionId }` | `{ paid }`; credits are added once |
+| POST | `rsvp` | `{ id, on }` | Community events |
+| POST | `event` | `{ title, kind, start, dur, link?, body? }` | Mentors host events |
 | POST | `material` | `{ id?, title, type, pack, level, blocks, status }` | Mentor's own materials; `status: "In review"` sends for review |
 | POST | `assign` / `unassign` / `progress` | | Materials to students |
 | POST | `post` / `comment` / `like` / `report` | | Community (rules: link blocking, first-post review, hide after 3 reports) |
@@ -49,7 +58,8 @@ Sign-up, password reset and parent accounts are on the website.
 
 `bootstrap` returns `me, state, config, matches, lessons, tasks, questions,
 sharedQs, assignments, library, requests, bookings (from the website), grids,
-busy, directory, threads, posts, groupCounts, members, now`.
+busy, directory, threads, posts, groupCounts, members, events, payments, pkgs,
+payInfo, vapid, now`; `me.credits` and `me.packs`.
 
 ## Admin — `/api/admin/<action>` (admin token)
 
@@ -66,8 +76,16 @@ busy, directory, threads, posts, groupCounts, members, now`.
 | POST | `moderate` | `{ id: postId, op: "keep" \| "warn" \| "remove" }` |
 | POST | `config` | `{ key: flags\|maint\|announce\|annHist\|modRules\|pkgs\|reloadAt, value, audit? }` |
 | POST | `message` | `{ to, text }`, sent as the Global Link team |
+| POST | `payment` | `{ op: "record", userId, packId, amount, note }` \| `{ op: "confirm" \| "cancel" \| "refund", id }` |
+| POST | `payout` | `{ tutorId, month }` marks a mentor's month paid |
+| POST | `event` | create (`title, kind, start, dur, link, body`) or `{ op: "delete", id }` |
 
 Every admin change is written to `portal_audit`.
+
+## Other
+
+- `GET /api/cron` (`Authorization: Bearer $CRON_SECRET`): reminders, wrap-up, expiry.
+- `POST /api/stripe`: Stripe webhook. The event is fetched again from Stripe by id, so a forged body does nothing.
 
 ## Health
 

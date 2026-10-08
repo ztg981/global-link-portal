@@ -5,6 +5,7 @@
 //   PATCH /api/auth/me        { name?, lang?, timeZone? }                -> { user }
 //   POST /api/auth/password   { current, next }                          -> { token, user }
 //   GET  /api/auth/providers                                             -> { google, wechat, site }
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { cors, body, str, ipHash, fail } from '../_lib/http.js';
 import { hashPassword, verifyPassword, signToken, normUsername } from '../_lib/auth.js';
 import { sql, hit, count } from '../_lib/db.js';
@@ -79,7 +80,71 @@ async function providers(req, res) {
   });
 }
 
-const ROUTES = { login: ['POST', login], me: ['GET', me], password: ['POST', password], providers: ['GET', providers] };
+// ---- Google sign-in ----
+// Same Google OAuth client as the website (one client, two redirect URIs). The
+// browser goes to Google and back to /api/auth/google-callback, which matches
+// the Google account to a Global Link account (by Google ID, else by verified
+// email, which links it) and hands the page a one-time code (oauth_pending,
+// shared with the website). The desktop app does this in the system browser
+// (Google blocks sign-in inside embedded windows) and receives the code through
+// a globallink:// link. New Google users finish sign-up on the website.
+const googleOn = () => !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+const APP = () => (process.env.APP_URL || 'https://global-link-portal.vercel.app').replace(/\/$/, '');
+const sha = t => createHash('sha256').update(t).digest('hex');
+const cookie = (req, name) => (String(req.headers.cookie || '').split(/;\s*/).find(c => c.startsWith(name + '=')) || '').slice(name.length + 1);
+const back = (res, path) => { res.statusCode = 302; res.setHeader('location', APP() + path); res.end(); };
+
+async function google(req, res) {
+  if (!googleOn()) return back(res, '/#/oauth-error/not-configured');
+  const state = randomBytes(24).toString('base64url') + (req.query.desktop === '1' ? '.d' : '');
+  res.setHeader('set-cookie', `gl_app_oauth=${state}; Path=/api/auth; Max-Age=600; HttpOnly; Secure; SameSite=Lax`);
+  const q = new URLSearchParams({ client_id: process.env.GOOGLE_CLIENT_ID, redirect_uri: APP() + '/api/auth/google-callback', response_type: 'code', scope: 'openid email profile', state, prompt: 'select_account' });
+  res.statusCode = 302; res.setHeader('location', 'https://accounts.google.com/o/oauth2/v2/auth?' + q); res.end();
+}
+
+async function googleCallback(req, res) {
+  const state = String(req.query.state || ''), saved = cookie(req, 'gl_app_oauth');
+  res.setHeader('set-cookie', 'gl_app_oauth=; Path=/api/auth; Max-Age=0; HttpOnly; Secure; SameSite=Lax');
+  if (!googleOn() || !state || !saved || state.length !== saved.length || !timingSafeEqual(Buffer.from(state), Buffer.from(saved)) || !req.query.code) return back(res, '/#/oauth-error/failed');
+  const desktop = state.endsWith('.d');
+  const tok = await fetch('https://oauth2.googleapis.com/token', { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ code: String(req.query.code), client_id: process.env.GOOGLE_CLIENT_ID, client_secret: process.env.GOOGLE_CLIENT_SECRET, redirect_uri: APP() + '/api/auth/google-callback', grant_type: 'authorization_code' }) }).then(r => r.json());
+  if (!tok.id_token) return back(res, '/#/oauth-error/failed');
+  const info = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(tok.id_token)).then(r => r.json());
+  if (info.aud !== process.env.GOOGLE_CLIENT_ID || !['accounts.google.com', 'https://accounts.google.com'].includes(info.iss) || String(info.email_verified) !== 'true' || !info.sub) return back(res, '/#/oauth-error/failed');
+  const email = String(info.email || '').toLowerCase();
+  let [user] = await sql`SELECT * FROM users WHERE google_sub = ${info.sub}`;
+  if (!user) {
+    [user] = await sql`SELECT * FROM users WHERE email = ${email}`;
+    if (user) await sql`UPDATE users SET google_sub = ${info.sub}, updated_at = now() WHERE id = ${user.id} AND google_sub IS NULL`;
+  }
+  if (!user) return back(res, '/#/oauth-error/no-account/' + encodeURIComponent(email));
+  if (user.status === 'suspended') return back(res, '/#/oauth-error/suspended');
+  const code = randomBytes(32).toString('base64url');
+  await sql`INSERT INTO oauth_pending (code_hash, provider, subject, email, name, user_id, expires_at) VALUES (${sha(code)}, 'google', ${info.sub}, ${email}, ${String(info.name || '').slice(0, 120)}, ${user.id}, ${new Date(Date.now() + 5 * 60000).toISOString()})`;
+  if (!desktop) return back(res, '/#/oauth/' + code);
+  // Desktop: hand the code to the app via its globallink:// link.
+  res.statusCode = 200; res.setHeader('content-type', 'text/html; charset=utf-8');
+  res.setHeader('content-security-policy', "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'");
+  const link = 'globallink://oauth/' + code;
+  return res.end(`<!doctype html><meta charset="utf-8"><title>Global Link</title><body style="margin:0;height:100vh;display:grid;place-items:center;background:#0c1730;color:#e8f0ff;font:16px system-ui,sans-serif;text-align:center"><div><h1 style="font-size:24px">You’re signed in</h1><p style="color:#a9b9d6">Return to the Global Link app to continue.</p><p><a href="${link}" style="display:inline-block;margin-top:10px;padding:12px 22px;border-radius:12px;background:#2f8cf3;color:#fff;text-decoration:none;font-weight:700">Open Global Link</a></p><p style="color:#7d8fb0;font-size:13px">You can close this tab afterwards.</p></div><script>location.href=${JSON.stringify(link)}</script></body>`);
+}
+
+async function oauth(req, res) {
+  const b = body(req) || {};
+  const code = str(b.code, 200);
+  if (!code) return fail(res, 400, 'Missing sign-in code.');
+  const [p] = await sql`UPDATE oauth_pending SET used_at = now() WHERE code_hash = ${sha(code)} AND used_at IS NULL AND expires_at > now() RETURNING user_id`;
+  if (!p || !p.user_id) return fail(res, 401, 'That sign-in link expired. Please try again.');
+  const [user] = await sql`SELECT * FROM users WHERE id = ${p.user_id}`;
+  if (!user || user.status === 'suspended') return fail(res, 403, 'This account is paused. Contact support@globallink.com.');
+  if (user.role === 'parent') return fail(res, 403, 'Parent accounts use globallink.com for now. The portal is for students and mentors.');
+  await sql`UPDATE users SET last_login_at = now() WHERE id = ${user.id}`;
+  return res.status(200).json({ token: signToken(user), user: meUser(user) });
+}
+
+const ROUTES = { login: ['POST', login], me: ['GET', me], password: ['POST', password], providers: ['GET', providers],
+  google: ['GET', google], 'google-callback': ['GET', googleCallback], oauth: ['POST', oauth] };
 
 export default async function handler(req, res) {
   if (cors(req, res)) return;

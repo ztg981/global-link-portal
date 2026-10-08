@@ -1,6 +1,7 @@
 // Exact-match patches for the design's markup (everything before the script).
 // Demo screens are wrapped in {{ DEMO }}; LIVE gets the same layout bound to real data.
 import { LIVE_SCREENS } from './live-screens.mjs';
+import { MORE_SCREENS_3 } from './live-screens-3.mjs';
 const r = String.raw;
 
 const HEAD = r`<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -39,4 +40,5 @@ export const TEMPLATE_PATCHES = [
       <sc-if value="{{ needOtp }}"><x-import component-from-global-scope="GlobalLinkUI.TextField" label="Authenticator code" type="text" value="{{ otp }}" onChange="{{ setOtp }}" autoComplete="one-time-code" hint="Admin accounts use two-step sign-in." hint-size="100%,72px"></x-import></sc-if>`],
   [/\n      <div style="margin-top:6px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px;border-radius:14px;border:1px dashed var\(--gl-blue-soft\);background:var\(--gl-soft\)">\n        <span[^\n]*>DEV<\/span>\n[^\n]*\n[^\n]*asAdminLogin[^\n]*\n      <\/div>/, ''],
   ...LIVE_SCREENS,
+  ...MORE_SCREENS_3,
 ];
