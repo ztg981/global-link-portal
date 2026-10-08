@@ -3,7 +3,7 @@
 //   copy is only used offline.
 // - Static files (vendor, design system, icons, images) are cache-first.
 // - /api is never cached (it carries personal data).
-const VERSION = 'gl-portal-v1';
+const VERSION = 'gl-portal-v2';
 const SHELL = ['/', '/index.html', '/support.js', '/live.js', '/shell.js', '/shell.css', '/config.js', '/gl-icon.js', '/vendor/resources.js',
   '/vendor/react-18.3.1/react.production.min.js', '/vendor/react-18.3.1/react-dom.production.min.js',
   '/_ds/global-link-4f8ca963-88b7-4790-8eff-955934ef565b/styles.css', '/_ds/global-link-4f8ca963-88b7-4790-8eff-955934ef565b/_ds_bundle.css',

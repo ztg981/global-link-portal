@@ -1,11 +1,12 @@
 // GLIcon — Lucide line icon (inline SVG, inherits currentColor). Fetched once per name and cached.
 // Usage in a DC: <x-import component-from-global-scope="GLIcon" n="bell" s="18"></x-import>
 (function () {
-  var CDN = 'https://unpkg.com/lucide-static@0.460.0/icons/';
+  // Self-hosted first (vendor/lucide, reachable in mainland China), unpkg as a fallback.
+  var LOCAL = 'vendor/lucide/', CDN = 'https://unpkg.com/lucide-static@0.460.0/icons/';
   var cache = {}, pending = {};
   function load(n) {
     if (cache[n] || pending[n]) return pending[n] || Promise.resolve(cache[n]);
-    pending[n] = fetch(CDN + n + '.svg').then(function (r) { return r.ok ? r.text() : ''; }).catch(function () { return ''; }).then(function (t) {
+    pending[n] = fetch(LOCAL + n + '.svg').then(function (r) { if (!r.ok) throw 0; return r.text(); }).catch(function () { return fetch(CDN + n + '.svg').then(function (r) { return r.ok ? r.text() : ''; }); }).catch(function () { return ''; }).then(function (t) {
       t = t.replace(/<!--[\s\S]*?-->/g, '').replace(/\swidth="24"/, ' width="100%"').replace(/\sheight="24"/, ' height="100%"').replace(/stroke-width="2"/, 'stroke-width="1.9"');
       cache[n] = t; delete pending[n]; return t;
     });
