@@ -38,7 +38,7 @@ of both.
 (plus `design/HANDOFF.md`). `index.html` is **generated** from it:
 
 ```bash
-npm run build        # node scripts/build-app.mjs
+npm run build:app    # node scripts/build-app.mjs
 ```
 
 The build keeps the design 1:1 and only adds what a real app needs. Every patch
@@ -58,14 +58,14 @@ must match the design exactly, so a changed export fails loudly.
   web app, desktop bridge, update banner.
 
 After editing the design in Claude Design, export it to `design/` and run
-`npm run build`. CI checks that `index.html` matches the export.
+`npm run build:app`. CI checks that `index.html` matches the export.
 
 ## Run locally
 
 ```bash
 npm install
 cp .env.example .env.local     # add your own keys; never commit them
-npm run build
+npm run build:app
 PGLITE_DIR=.pglite node scripts/seed-dev.mjs   # test_student / test_mentor, password: password123
 npm run dev                    # http://localhost:3124
 ```

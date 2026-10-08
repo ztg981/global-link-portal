@@ -11,8 +11,8 @@
     "test": "node --test test/*.test.mjs",
     "icons": "node scripts/copy-icons.mjs",
     "security:scan": "node scripts/security-scan.mjs",
-    "build": "node scripts/build-app.mjs",
-    "seed": "node scripts/seed-dev.mjs"
+    "seed": "node scripts/seed-dev.mjs",
+    "build:app": "node scripts/build-app.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0"
