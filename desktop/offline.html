@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:">
+<title>Global Link</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #0c1730; color: #e8f0ff; font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-app-region: drag; }
+  main { height: 100%; display: grid; place-items: center; text-align: center; padding: 24px; box-sizing: border-box; }
+  h1 { margin: 16px 0 6px; font-size: 24px; letter-spacing: -.02em; }
+  p { margin: 0 auto; max-width: 380px; color: #a9b9d6; }
+  button { -webkit-app-region: no-drag; margin-top: 22px; height: 44px; padding: 0 22px; border: 0; border-radius: 12px; background: linear-gradient(135deg, #3b97ff, #1f6fd8); color: #fff; font: 700 15px system-ui, sans-serif; cursor: pointer; }
+  .dot { width: 56px; height: 56px; margin: 0 auto; border-radius: 16px; background: linear-gradient(135deg, #46a0ff, #1f6fd8); display: grid; place-items: center; font-weight: 800; font-size: 26px; }
+</style>
+</head>
+<body>
+<main>
+  <div>
+    <div class="dot">G</div>
+    <h1>You’re offline</h1>
+    <p>Global Link needs the internet to load your lessons and messages. Check your connection, then try again. 网络连接中断，请检查后重试。</p>
+    <button id="retry">Try again</button>
+  </div>
+</main>
+<script>
+  document.getElementById('retry').onclick = function () { window.glDesktop && window.glDesktop.retry(); };
+  window.addEventListener('online', function () { window.glDesktop && window.glDesktop.retry(); });
+</script>
+</body>
+</html>

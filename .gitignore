@@ -1,0 +1,11 @@
+node_modules/
+.vercel/
+.env
+.env.*
+!.env.example
+.pglite/
+_zip/
+desktop/node_modules/
+desktop/dist/
+desktop/release/
+*.log

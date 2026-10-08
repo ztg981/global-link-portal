@@ -1,0 +1,11 @@
+_zip
+design
+desktop
+dev
+test
+scripts
+node_modules
+.pglite
+*.md
+!README.md
+db

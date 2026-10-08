@@ -1,0 +1,59 @@
+{
+  "name": "global-link-desktop",
+  "productName": "Global Link",
+  "version": "0.1.0",
+  "description": "Global Link for Windows and macOS",
+  "author": "Global Link",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "dev": "cross-env GL_APP_URL=http://localhost:3124 electron .",
+    "dist:win": "electron-builder --win --x64 --publish never",
+    "dist:mac": "electron-builder --mac --x64 --arm64 --publish never",
+    "release": "electron-builder --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "electron": "^39.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.globallink.portal",
+    "productName": "Global Link",
+    "copyright": "Global Link",
+    "directories": { "output": "release", "buildResources": "build" },
+    "files": ["main.cjs", "preload.cjs", "offline.html", "build/icon.png", "build/tray.png", "build/tray@2x.png", "package.json"],
+    "publish": [{ "provider": "github", "owner": "ztg981", "repo": "global-link-portal", "releaseType": "release" }],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.png",
+      "artifactName": "Global-Link-Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Global Link"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.education",
+      "icon": "build/icon.png",
+      "identity": "-",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "artifactName": "Global-Link-mac-${arch}.${ext}",
+      "extendInfo": {
+        "NSCameraUsageDescription": "Global Link uses your camera for video lessons.",
+        "NSMicrophoneUsageDescription": "Global Link uses your microphone for video lessons."
+      }
+    },
+    "dmg": { "artifactName": "Global-Link-mac-${arch}.${ext}" }
+  }
+}

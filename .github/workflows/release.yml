@@ -1,0 +1,32 @@
+# Builds the desktop app and publishes it to GitHub Releases.
+# electron-updater in installed apps reads latest.yml / latest-mac.yml from the
+# newest release, so pushing a tag like v0.1.1 ships an update to everyone.
+#   git tag v0.1.1 && git push origin v0.1.1   (bump desktop/package.json first)
+name: Release desktop app
+on:
+  push: { tags: ['v*'] }
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            args: --win --x64
+          - os: macos-latest
+            args: --mac --x64 --arm64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    defaults: { run: { working-directory: desktop } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --no-audit --no-fund
+      - name: Build and publish
+        run: npx electron-builder ${{ matrix.args }} --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'

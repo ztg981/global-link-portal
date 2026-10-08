@@ -1,0 +1,19 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions: { contents: read }
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: index.html is built from the design export
+        run: node scripts/build-app.mjs && git diff --exit-code index.html
+      - run: npm test
+      - run: npm run security:scan
+      - run: npm audit --omit=dev --audit-level=high

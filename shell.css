@@ -1,0 +1,92 @@
+/* Phone and home-screen layout for the portal.
+   The design is a desktop layout made of inline styles, so phone rules use
+   attribute selectors and !important. Desktop (wider than 760px) is untouched.
+   iOS lessons from OffScript: viewport-fit=cover + env(safe-area-*), the bottom
+   nav is fixed straight to the bottom edge, 16px inputs (no focus zoom). */
+html { -webkit-text-size-adjust: 100%; }
+button, a, [role="button"] { -webkit-tap-highlight-color: transparent; }
+
+@media (max-width: 760px) {
+  [data-rm] input, [data-rm] textarea, [data-rm] select { font-size: 16px !important; }
+  [data-rm] button { touch-action: manipulation; }
+
+  /* Title bar: clear the status bar / notch, keep only what fits. */
+  [data-screen-label="Title bar"] { height: calc(50px + env(safe-area-inset-top)) !important; padding: env(safe-area-inset-top) 10px 0 calc(10px + env(safe-area-inset-left)) !important; gap: 8px !important; }
+  [data-screen-label="Title bar"] > div:nth-of-type(1) > span { display: none !important; }
+  [data-screen-label="Title bar"] [data-tour="tb-search"] { width: 40px !important; flex: none; justify-content: center; padding: 0 !important; }
+  [data-screen-label="Title bar"] [data-tour="tb-search"] > span { display: none !important; }
+  [data-screen-label="Title bar"] > div:last-child > div:first-child { width: auto !important; }
+
+  /* Sidebar becomes a bottom tab bar. */
+  aside[data-screen-label="Sidebar"] {
+    position: fixed !important; left: 0; right: 0; bottom: 0; z-index: 40;
+    width: auto !important; height: auto !important; flex-direction: row !important;
+    border-right: 0 !important; border-top: 1px solid var(--gl-line);
+    padding: 6px calc(4px + env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) calc(4px + env(safe-area-inset-left)) !important;
+    box-shadow: 0 -8px 24px rgba(20, 48, 94, .08);
+  }
+  aside[data-screen-label="Sidebar"] > :not(nav) { display: none !important; }
+  aside[data-screen-label="Sidebar"] nav {
+    flex-direction: row !important; gap: 2px !important; padding: 0 !important; overflow-x: auto !important; overflow-y: hidden !important;
+    scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+  }
+  aside[data-screen-label="Sidebar"] nav > div:first-child { display: none !important; } /* sliding indicator */
+  aside[data-screen-label="Sidebar"] nav button {
+    flex: 1 0 64px !important; width: auto !important; min-width: 64px !important; height: 52px !important;
+    flex-direction: column !important; justify-content: center !important; gap: 3px !important; padding: 0 4px !important;
+    color: var(--gl-muted) !important; border-radius: 12px !important; scroll-snap-align: start;
+  }
+  aside[data-screen-label="Sidebar"] nav button > span:not([title]) { flex: none !important; opacity: 1 !important; font-size: 10.5px; line-height: 1.1; white-space: nowrap; }
+  aside[data-screen-label="Sidebar"] nav button > span[title], aside[data-screen-label="Sidebar"] nav button > span[style*="position: absolute"] { position: absolute !important; top: 3px; right: 10px; margin: 0 !important; }
+  aside[data-screen-label="Sidebar"] nav button[data-on="1"] { color: var(--gl-blue) !important; background: var(--gl-tint) !important; }
+
+  /* Content: normal scrolling, clear of the tab bar and the home indicator. */
+  main { padding-bottom: calc(76px + env(safe-area-inset-bottom)); overscroll-behavior: contain; }
+  main > div { padding: 16px max(14px, env(safe-area-inset-left)) 40px max(14px, env(safe-area-inset-right)) !important; }
+  main h1 { font-size: 23px !important; }
+
+  /* Hero cards: no room for the floating sticky notes beside the text. */
+  [data-rm] [style*="padding-right: 170px"], [data-rm] [style*="padding-right: 190px"] { padding-right: 0 !important; }
+  [data-rm] [style*="animation: 5s ease-in-out 0s infinite normal none running glBob"], [data-rm] [style*="glBob"] { display: none !important; }
+  [data-rm] [style*="padding: 26px 28px"] { padding: 20px !important; }
+  [data-rm] [style*="grid-column: span 2"] { grid-column: auto !important; }
+
+  /* Sign in: one column, no illustration. */
+  [data-screen-label="Sign in"] { grid-template-columns: minmax(0, 1fr) !important; }
+  [data-screen-label="Sign in"] > div:first-child { display: none !important; }
+  [data-screen-label="Sign in"] > div:last-child { padding: 28px 20px calc(28px + env(safe-area-inset-bottom)) !important; }
+
+  /* Floating pieces sit above the tab bar; drawers start below the taller title bar. */
+  [data-rm] button[title="Practice with Lumi"] { right: 14px !important; bottom: calc(80px + env(safe-area-inset-bottom)) !important; padding: 5px !important; }
+  [data-rm] button[title="Practice with Lumi"] > :not(:first-child) { display: none !important; }
+  [data-rm] [style*="bottom: 16px"][style*="width: min(370px"] { left: 12px !important; right: 12px !important; width: auto !important; bottom: calc(78px + env(safe-area-inset-bottom)) !important; max-height: calc(100% - 140px); overflow: auto !important; }
+  [data-rm] [style*="position: absolute; top: 40px; right: 0px; bottom: 0px"], [data-rm] [style*="position: absolute; top: 46px"] { top: calc(50px + env(safe-area-inset-top)) !important; }
+  [data-rm] [data-screen-label="Full recap"] { left: 0 !important; }
+
+  /* Side-by-side layouts (thread list | chat, settings nav | panel) stack. */
+  main [style*="grid-template-columns: minmax(2"], main [style*="grid-template-columns: minmax(1"], main [style*="grid-template-columns: 2"] { grid-template-columns: minmax(0, 1fr) !important; }
+  [data-screen-label="Messages"] { grid-template-rows: auto minmax(0, 1fr); height: calc(100dvh - 250px) !important; min-height: 420px !important; }
+  [data-screen-label="Messages"] > :first-child { max-height: 160px; border-right: 0 !important; border-bottom: 1px solid var(--gl-line); }
+  [data-screen-label="Settings"] > nav { display: flex !important; overflow-x: auto; gap: 6px; }
+  [data-screen-label="Settings"] > nav > button { flex: none; }
+
+  /* Panels and drawers fit the screen. */
+  [data-rm] [style*="position: absolute"][style*="width: 4"], [data-rm] [style*="position: fixed"][style*="width: 4"] { max-width: 100vw !important; }
+  [data-rm] [style*="min-width: 3"], [data-rm] [style*="min-width: 4"] { min-width: 0 !important; }
+}
+
+/* Installed on a phone home screen: no rubber-band scrolling of the whole app. */
+html[data-standalone] body { overscroll-behavior: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}
+
+/* Desktop update banner (shell.js). */
+#gl-update { position: fixed; z-index: 99; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 10px 10px 10px 16px; border-radius: 14px; background: #0c1730; color: #fff; font: 600 13.5px 'Plus Jakarta Sans', system-ui, sans-serif; box-shadow: 0 18px 40px rgba(12, 23, 48, .35); }
+#gl-update button { height: 32px; padding: 0 12px; border: 0; border-radius: 9px; background: linear-gradient(135deg, #3b97ff, #1f6fd8); color: #fff; font: inherit; cursor: pointer; }
+#gl-update button:last-child { background: transparent; color: #a9b9d6; padding: 0 8px; font-size: 18px; }
+
+/* Desktop app: the OS draws the real window buttons where the design shows placeholders. */
+html[data-desktop] [title="macOS draws its window buttons here"] > span,
+html[data-desktop] [title="Windows draws its window buttons here"] > span { visibility: hidden; }
